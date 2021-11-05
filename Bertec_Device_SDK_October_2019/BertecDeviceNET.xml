@@ -1,0 +1,986 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        "BertecDeviceNET"
+    </assembly>
+    <members>
+        <member name="M:BertecDeviceNET.BertecDevice.SetDeviceLogDirectory(System.String,System.Int32)">
+            <summary>
+Set or changes the output folder for the device logs and how long the logs should be kept.You should call this before anything else.
+Defaults to the %temp%/bertec-device-logs folder and 7 days. Pass an empty string for the outputFolder to use the default directory, and 0 to turn off age cleaning.
+The filename is automatically generated and cannot be changed (see CurrentDeviceLogFilename).
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.CurrentDeviceLogFilename">
+            <summary>
+The current device log filename.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.UnifiedDataMode">
+            <summary>
+By default, the library will only present data via the callback or data polling when *all* devices have data, allowing for software sync,
+device aggregation, and data averaging. This is typically the desired mode, but some applications may benefit from turning this functionality off.
+If UnifiedDataMode false, then the library will present data whenever *any* device has data, even if the others do not.
+Software sync, device aggregation, and data averaging will *not* be performed in this mode. The data frame received by the callback or data polling
+will be incomplete; your implimentation must be ready to check for and handle cases where device #1 presents data but #2 will not, and then some
+frames later that will change to #2 has data but #1 does not; the data will appear to be unaligned with zero values for the no-data-present device structures.
+The simplest method to handle this situtation is to check the DataFrame.forceData array for the device; if this is empty, there is no data for
+that device in the current frame.
+Turning off unified data implies that your application will do it's own post-processing of the data, using either the sequence number or timestamp
+values to perform some kind of specialized alignment.
+Set this flag prior to calling Start in order to ensure that the data being received is in the format expected.
+Using non-unified data mode with a single plate has no net effect.
+Computed channels, device clocks and sync pin settings (ComputedChannelFlags, ResetDeviceClock, SetExternalClockMode, etc)
+will still function if unified data is turned off; however, data averaging and aggregation (AveragingSize, AggregateDeviceMode) will not.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ResetAllDeviceClocksAtTime(System.Int64,System.Int64)">
+            <summary>
+Sets all of the devices' internal clock timers (bertec_AdditionalData.timestamp) to the same given value when the timestamp reaches the condition value.
+This is only valid for devices that support the extended TIMESTAMP feature set; it will be ignored otherwise.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ResetDeviceClockAtTime(System.Int32,System.Int64,System.Int64)">
+            <summary>
+Sets the device's internal clock timer (bertec_AdditionalData.timestamp) to the given value when the timestamp reaches the condition value.
+This is only valid for devices that support the extended TIMESTAMP feature set; it will be ignored otherwise.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ResetAllDeviceClocks(System.Int64)">
+            <summary>
+Sets all of the devices' internal clock timers (bertec_AdditionalData.timestamp) to the same given value.
+This is only valid for devices that support the extended TIMESTAMP feature set; it will be ignored otherwise.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ResetDeviceClock(System.Int32,System.Int64)">
+            <summary>
+Sets the device's internal clock timer (bertec_AdditionalData.timestamp) to the given value.
+This is only valid for devices that support the extended TIMESTAMP feature set; it will be ignored otherwise.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.RedetectConnectedDevices">
+            <summary>
+Signal the sdk that it should perform a device rescan and reinit all the devices. This is the same as physically unplugging and
+then replugging all devices from the usb connection at the same time. The status LOOKING_FOR_DEVICES will be emitted. Does not block.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ResetSyncCounters">
+            <summary>
+Reset the internal sync counters to zero - used with dual synced plates.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.SetSyncAuxPinValues(System.Int32,System.Int32,System.Int32)">
+            <summary>
+Sets both the SYNC and AUX output pins to the passed values; these values only take effect if the given pin has been set to _INSTANT.
+If the pin has not been set to _INSTANT, then the passed value is ignored.Note that you must pass both values even if you intend to only set one pin.
+Only valid for devices that support the extended SYNC and AUX feature set.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.SetAuxPinMode(System.Int32,BertecDeviceNET.AuxModeFlags)">
+            <summary>
+ Sets the AUX pin operating mode. This is only valid for devices that support the extended SYNC and AUX feature set.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.SetSyncPinMode(System.Int32,BertecDeviceNET.SyncModeFlags)">
+            <summary>
+ Sets the SYNC pin operating mode. This is only valid for devices that support the extended SYNC and AUX feature set. Overrides the current master/slave relationship.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.SetExternalClockMode(System.Int32,BertecDeviceNET.ClockSourceFlags)">
+            <summary>
+Enables the ability for the SDK to clock the data stream against an external sync or clock source tied into the physical SYNC connection.
+Setting this to any non - zero value overrides the internal 1000hz hardware clock, allowing the data to be either under or over sampled as needed.
+Special note : using an external clock disables Averaging, low - pass Filtering, and multiple plate sync abilities.
+Your hardware needs will dictate of this mode is suitable for your configuration, and your hardware must be capable of delivering the proper
+SYNC signal.Failure to do so will cause either random samples or no samples at all.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.MasterSlaveMode">
+            <summary>
+Enables or disables the slave/master setting when more than one device connected. If this set to FALSE or if there is only one device connected,
+the sync mode is set to SYNC_NONE (sampled) and internal hardware clock timers are reset (if present).
+If this set to TRUE and there is two or more devices, then the first device is set as SYNC_OUT_MASTER and all other devices are set as SYNC_IN_SLAVE,
+and internal hardware clock timers are reset (if present).
+By default the Master/Slave mode is enabled and will automatically be set up if two or more devices are present. Setting this to FALSE after Init but before
+calling Start will prevent this and cause all devices to run as SYNC_NONE. You can change this at any point during runtime by setting this to either TRUE
+or FALSE.
+Setting this to TRUE is exactly the same as calling bertec_SetSyncPinMode with SYNC_OUT_MASTER for the first device and SYNC_IN_SLAVE for all others and
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.UsbThreadPriority">
+            <summary>
+Sets the usb thread reader priority. Advanced functionality, usually not needed.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.DeviceChannelNames(System.Int32)">
+            <summary>
+Returns an array of strings containing the channel names for the device (same order as what is in the data frame)
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.DeviceStatus(System.Int32)">
+            <summary>
+A given Device's current status, separate from the overall state. Zero is good, negative bad.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.DeviceModelNumber(System.Int32)">
+            <summary>
+A given Device's model number.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.DeviceSerialNumber(System.Int32)">
+            <summary>
+A given Device's serial number.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.LowpassFilterSamples">
+            <summary>
+The low-pass filtering value. Should be &gt;=1. Setting to 0 or less turns it off
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.AveragingSize">
+            <summary>
+The averaging sample filter size. Less than 2 = no averaging.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.Devices">
+            <summary>
+List of attached Devices
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.DeviceCount">
+            <summary>
+How many attached devices are in the Devices list
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ReadBufferedDataChannelsOnlyByRef(System.ValueType!System.Single!System.Runtime.CompilerServices.IsBoxed[]@)">
+            <summary>
+Reads and returns only the channel data for the buffered data into the passed array object; the dataframe timestamp and aux/sync values are not
+returned. Multiple plate data is combined into a single array. Returns how many frames remain including this one.
+If there are no more data blocks waiting to be read in the buffer this will return zero and the passed array will be zero.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ReadBufferedDataChannelsOnly">
+            <summary>
+Reads and returns only the channel data for the buffered data in an array; the dataframe timestamp and aux/sync values are not
+returned. Multiple plate data is combined into a single array. If there is no data in the buffer then this will return an empty array.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ReadBufferedData(BertecDeviceNET.DataFrame[]@)">
+            <summary>
+If not using events, this will read one buffered data frame and return how many frames remain including this one.
+If there are no more data blocks waiting to be read in the buffer this will return zero.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.MaxBufferedDataSize">
+            <summary>
+By default the api will buffer up to 100 samples before discarding old data. If you believe your system cannot keep up or are using slow polling, then
+increase this value.Be aware that larger values( ex: 5000 ) will dramatically increase memory usage which can impact your application.
+Note that changing the size will force a discard of all currently buffered data, so do this before calling Start
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.BufferedDataAvailable">
+            <summary>
+Returns how many frames of data remain in the internal buffer (don't use for event-based data reading)
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ClearBufferedData">
+            <summary>
+Discards all current data in the buffer
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.AutoZeroState">
+            <summary>
+Returns the current enum status of the autozeroing. See AutoZeroStates
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.AutoZeroing">
+            <summary>
+Enables or disables autozeroing of the plate, which occurs if the plate is loaded at less than 40 Newtons for about 3.5 seconds.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.AggregateDeviceMode">
+            <summary>
+Enables or disables the ability to combine the output of two plates as one long virtual plate. This can be enabled or disabled at any point,
+and the channel values in the DataFrame data block will change accordingly. If this mode is turned on then you will always receive only a single
+DataFrame in your even handler or ReadBufferedData call, even if there is more than one device connected. Note that BertecDevice.DeviceCount will
+In order for this to work properly both devices must be of the same type, same size, and have the same data channels. You should not try to
+combine a balance plate with a force plate, or a sport plate with a functional model for example.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.SubjectHeight">
+            <summary>
+For the SwayAngle computation to be valid, the height of the person standing on the plate must be known.
+If this value is not set the program will default to 1.5 meters (1500mm). This value CAN be changed while data is being collected.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.ComputedChannelFlags">
+            <summary>
+Enables or disables the ability to compute certain channels from the force device's FZ, MX, and MY values. If the device does not have the
+appropriate channels, then setting this will have no effect. Note that turning on the COG and Sway Angle channels may incur a small CPU usage
+penalty and require setting the subject height via BertecDevice.SetSubjectHeight. The COP calculation is a simple moments over force function and
+has little to no additional CPU overhead. The COP also does not need the subject height set in order to be used.
+This function must be called before BertecDevice.Start; calling this while devices are actively delivering data will result in an error. 
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.DataRate">
+            <summary>
+Returns a dynamically computed value of the sample rate from the device, in hertz. This value is updated approximately every 100 ms
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.ZeroNow">
+            <summary>
+Zero all the input channels to the current load
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.Stop">
+            <summary>
+Stop the data gathering. Return a zero value if the process is stopped correctly.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.BertecDevice.Start">
+            <summary>
+Start the data gathering. Return a zero value if the process is started correctly.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.Status">
+            <summary>
+Overall status of system. Zero is good, negative bad
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.BertecDevice.Version">
+            <summary>
+Version of the Bertec DLL
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.BertecDevice">
+            <summary>
+The BertecDevice class is what you will need to use to access the Bertec Devices that are attached
+to the USB port. Creating the class will connect to any attached Bertec Devices. Checking the Status
+property will tell you if there is a problem, and the list of attached Devices can be gotten
+from the Devices list. 
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.LogEventHandler">
+            <summary>
+Represents the method that handles any special logging outputs the listener wants.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.DeviceTimestampEventHandler">
+            <summary>
+Represents the method that handles the BertecDeviceNET.OnDeviceTimestamp event of the BertecDevice object.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.DeviceSortEventHandler">
+            <summary>
+Represents the method that handles the BertecDeviceNET.OnDeviceSort event of the BertecDevice object.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.StatusEventHandler">
+            <summary>
+Represents the method that handles the BertecDeviceNET.StatusEvent event of the BertecDevice object.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.DataEventHandler">
+            <summary>
+Represents the method that handles the BertecDeviceNET.DataEvent event of the BertecDevice object.
+The data array the data frames for each device.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.DataFrame.forceData">
+            <summary>
+all of the force data for this frame, up the device's channel count.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.DataFrame.syncData">
+            <summary>
+rolling 8-bit value of the SYNC pin status. MSB is the current value. Valid in all SYNC pin modes.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.DataFrame.auxData">
+            <summary>
+rolling 8-bit value of the AUX pin status. MSB is the current value. Valid in all AUX pin modes.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.DataFrame.timestamp">
+            <summary>
+the plate's clock or "sequence number" for this frame of data. Devices without the InternalClock feature will have this backfilled by computed sequence numbers.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.DataFrame">
+            <summary>
+A single frame of data for a device. This includes the force data and any timestamp/sync pin flags
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceList.default(System.Int32)">
+            <summary>
+Gets the DeviceInfo at the specified index.
+</summary>
+            <param name="index">The zero-based index of the DeviceInfo to get</param>
+            <returns>The DeviceInfo at the specified index.</returns>
+        </member>
+        <member name="T:BertecDeviceNET.DeviceList">
+            <summary>
+Provides a collection of the currently attached devices.
+</summary>
+        </member>
+        <member name="M:BertecDeviceNET.DeviceInfo.ZeroLevelNoiseValue(System.Int32)">
+            <summary>
+Returns the zero level noise value for a channel. Either ZeroNow or AutoZeroing must have been called prior to this 
+being used. The value returned is a computed value that can be used for advanced filtering. 
+Valid values are always zero or positive; negative values indicate either no zeroing or some other error.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.ChannelNames">
+            <summary>
+The name of each channel as an array of strings.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.HasAuxSyncPins">
+            <summary>
+If set, then the device has full control over the aux and sync pins.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.HasInternalClock">
+            <summary>
+if set, then the device has an internal 64-bit timestamp value which can be reset (1ms accuracy)
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.ChannelCount">
+            <summary>
+How many output channels there are.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.ModelNumber">
+            <summary>
+Model # of the device.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.SerialNumber">
+            <summary>
+Serial # of the device.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.SamplingFreq">
+            <summary>
+Native sampling frequency in Hertz.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.Status">
+            <summary>
+Status of the device, separate from the overall state. Zero is good, negative bad.
+</summary>
+        </member>
+        <member name="P:BertecDeviceNET.DeviceInfo.Version">
+            <summary>
+Version of the device. mmMM. Minor and Major are broken out from this. Ex: 0x0211 is minor version 17, major version 2
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.DeviceInfo">
+            <summary>
+Information about the Device.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.OriginOffset">
+            <summary>
+The origin offset of the device, in meters. The default is 0,0,0 which is dead-center.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.Dimensions">
+            <summary>
+The size of the device, in meters. If unknown, then will be 0,0
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.CommonDimensions">
+            <summary>
+Common plate dimensions for the standard Bertec plates (Essential, Functional, and Sport). Other plate sizes exist; see DeviceInfo.Dimensions and DeviceInfo.OriginOffset
+These are all expressed in millimeters.
+The placement of the Medial Malleolus line on the Functional plate aligns with an Essential when both plates are aligned on the front; to map the Y position
+of the line between a Functional and Essential (normalize the position between the two), you will need to add in a constant value of
+155mm (ESSENTIAL_MALLEOLUS_OFFSET_Y-FUNCTIONAL_MALLEOLUS_OFFSET_Y) to the computed Functional COPY value.
+Note that you DO NOT NEED TO DO THIS unless you care about the stance position and the markings on the plate; if your applicaiton just cares about
+the raw COP position, then you should NOT add any constant offsets and instead use the as-computed COP values.
+The Lateral Calcaneus X offset values are provided as informational use only and will be negative for the left side of the plate and positive for the right.
+</summary>
+        </member>
+        <member name="F:SPORT_CALCANEUS_OFFSET_X_MAJOR">
+            <summary> this is the third and largest hash mark, offset from the center.  </summary>
+        </member>
+        <member name="F:SPORT_CALCANEUS_OFFSET_X_MIDDLE">
+            <summary> this is the second hash mark, offset from the center.  </summary>
+        </member>
+        <member name="F:SPORT_CALCANEUS_OFFSET_X_MINOR">
+            <summary> this is the first hash mark, offset from the center. </summary>
+        </member>
+        <member name="F:SPORT_MALLEOLUS_OFFSET_Y">
+            <summary> this is where the foot placement center line is located on the plate, offset from the center. </summary>
+        </member>
+        <member name="F:FUNCTIONAL_CALCANEUS_OFFSET_X_MAJOR">
+            <summary> this is the third and largest hash mark, offset from the center.  </summary>
+        </member>
+        <member name="F:FUNCTIONAL_CALCANEUS_OFFSET_X_MIDDLE">
+            <summary> this is the second hash mark, offset from the center.  </summary>
+        </member>
+        <member name="F:FUNCTIONAL_CALCANEUS_OFFSET_X_MINOR">
+            <summary> this is the first hash mark, offset from the center. </summary>
+        </member>
+        <member name="F:FUNCTIONAL_MALLEOLUS_OFFSET_Y">
+            <summary> this is where the foot placement center line is located on the plate, offset from the center. Not valid for Aggregate Device Mode. </summary>
+        </member>
+        <member name="F:FUNCTIONAL_HEIGHT_MM">
+            <remarks> note that when Aggregate Device Mode is enabled, you should consider the virtual plate size 2x of this (1524mm)</remarks>
+        </member>
+        <member name="F:ESSENTIAL_CALCANEUS_OFFSET_X_MAJOR">
+            <summary> this is the third and largest hash mark, offset from the center.  </summary>
+        </member>
+        <member name="F:ESSENTIAL_CALCANEUS_OFFSET_X_MIDDLE">
+            <summary> this is the second hash mark, offset from the center.  </summary>
+        </member>
+        <member name="F:ESSENTIAL_CALCANEUS_OFFSET_X_MINOR">
+            <summary> this is the first hash mark, offset from the center. </summary>
+        </member>
+        <member name="F:ESSENTIAL_MALLEOLUS_OFFSET_Y">
+            <summary> this is where the foot placement center line is located on the plate, offset from the center. </summary>
+        </member>
+        <member name="T:BertecDeviceNET.ComputedChannelFlags">
+            <summary>
+Computed channels options. This is a bit field array. Note that the Sway Angle requires a set subject height to be correct.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.ClockSourceFlags">
+            <summary>
+Internal/External Clock Source flags.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.ClockSourceFlags.CLOCK_SOURCE_NO_INTERPOLATE">
+            <summary>
+By default the ClockSource logic will attempt to perform a fractional delay on the input data.
+This can cause the data signal to appear to be delayed by up to 4.875ms. If such a delay would
+cause problems with your code path you will need to pass this bit flag along with the clock source
+to change from a fractional delay to a more simpler skip-and-fill. Skip-and-fill will either omit or
+duplicate channel data depending on when the edge signal occurs in the data flow.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.ClockSourceFlags.CLOCK_SOURCE_EXT_BOTH">
+            <summary>
+This will cause data to be presented whenever the SYNC pin changes from either a low - to - high or high - to - low state.
+Averaging is disabled, and the SYNC mode is forced to SYNC_NONE. All other Aux modes are available,
+but multiple device sync is disabled.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.ClockSourceFlags.CLOCK_SOURCE_EXT_FALL">
+            <summary>
+This will cause data to be presented whenever the SYNC pin changes from high (1) to low (0),
+which can be higher (up to 4000hz) or lower (down to 1hz).
+Averaging is disabled, and the SYNC mode is forced to SYNC_NONE. All other Aux modes are available,
+but multiple device sync is disabled.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.ClockSourceFlags.CLOCK_SOURCE_EXT_RISE">
+            <summary>
+This will cause data to be presented whenever the SYNC pin changes from low (0) to high (1),
+which can be higher (up to 4000hz) or lower (down to 1hz).
+Averaging is disabled, and the SYNC mode is forced to SYNC_NONE. All other Aux modes are available,
+but multiple device sync is disabled.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.ClockSourceFlags.CLOCK_SOURCE_INTERNAL">
+            <summary>
+This is the default state and the SDK will present data at the native device rate (1000hz).
+Averaging will affect this. All Sync and Aux modes are available, including multiple device sync.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.AuxModeFlags">
+            <summary>
+Aux pin mode flags.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.AuxModeFlags.AUX_OUT_PATGEN">
+            <summary>
+The AUX pin is outputting a random pattern. This is useful for debugging.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.AuxModeFlags.AUX_OUT_INSTANT">
+            <summary>
+The AUX is outputting the value most recently set via the OUTPUT command.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.AuxModeFlags.AUX_IN_SAMPLED">
+            <summary>
+The AUX/ZERO pin is an input, and its value is not interpreted in any way.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.AuxModeFlags.AUX_NONE_AUX_IN_ZERO">
+            <summary>
+AM6500: The AUX pin is an input, but its value is not interpreted in any way.
+AM6800/AM6817: the input is taken from the ZERO pin, and a logic low level keeps the analog output signals zeroed.
+This is the default power-up mode.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.SyncModeFlags">
+            <summary>
+Sync pin mode flags.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.SyncModeFlags.SYNC_OUT_INSTANT">
+            <summary>
+The SYNC pin is outputting the value most recently set via the OUTPUT command.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.SyncModeFlags.SYNC_OUT_CONTINUOUS">
+            <summary>
+The SYNC pin is outputting a continuous 1kHz square wave clock without reference marks.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.SyncModeFlags.SYNC_IN_STROBED">
+            <summary>
+The SYNC pin is inputting a transient 1kHz square wave clock without reference mark.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.SyncModeFlags.SYNC_IN_CONTINUOUS">
+            <summary>
+The SYNC pin is inputting a continuous 1kHz square wave clock without reference marks.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.SyncModeFlags.SYNC_OUT_PATGEN">
+            <summary>
+The SYNC pin is outputting a random pattern. This is useful for debugging.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.SyncModeFlags.SYNC_IN_SLAVE">
+            <summary>
+The SYNC pin is inputting a 1kHz square wave clock with optional reference marks.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.SyncModeFlags.SYNC_OUT_MASTER">
+            <summary>
+The SYNC pin is outputting a 1kHz square wave clock with a reference mark embedded every 2000ms.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.SyncModeFlags.SYNC_NONE">
+            <summary>
+The SYNC pin is an input, but its value is not interpreted in any way. This mode is also known as as SYNC_IN_SAMPLED. This is the default power-up mode.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.AutoZeroStates">
+            <summary>
+Values that can be returned from reading the AutoZeroState property.
+</summary>
+        </member>
+        <member name="T:BertecDeviceNET.StatusErrors">
+            <summary>
+Error values that can be returned via the event or data poll.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNSUPPORED_COMMAND">
+            <summary>
+tInternal error - he firmware doesn't support the command that was attempted to be used
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNABLE_TO_LOCK_MUTEX">
+            <summary>
+internal logic error
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.ERROR_INVALIDHANDLE">
+            <summary>
+Internal error - handle is invalid
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.AUTOZEROSTATE_ZEROFOUND">
+            <summary>
+the zero leveling value was found
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.AUTOZEROSTATE_WORKING">
+            <summary>
+currently finding the zero values
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.DEVICES_READY">
+            <summary>
+there are devices connected
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.LOOKING_FOR_DEVICES">
+            <summary>
+the sdk is scanning for devices; the next status will be either NO_DEVICES_FOUND or DEVICES_READY
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNABLE_TO_STOP_FAILED">
+            <summary>
+Internal error - device threads have failed to shut down 
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNABLE_TO_START_FAILED">
+            <summary>
+Internal error - device threads have failed to spin up
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNABLE_TO_STOP_STARTING">
+            <summary>
+The Stop() function was called while the last Start() call was still being processed; the Stop() call may not take effect.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNABLE_TO_STOP_STOPPING">
+            <summary>
+The Stop() function was called twice; the second call was ignored 
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNABLE_TO_STOP_NOTRUNNING">
+            <summary>
+The Stop() function was called but Start() was not called first; the library is already stopped. */
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNABLE_TO_START_STOPPING">
+            <summary>
+The Start() function was called while the last Stop() call was still being processed; the Start() call was ignored.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.UNABLE_TO_START_STARTED">
+            <summary>
+The Start() function was called twice; the second call was ignored
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.DEVICE_HAS_FAULTED">
+            <summary>
+the device has failed in some manner - power off the device, check all connections, power back on
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.NO_DATA_RECEIVED">
+            <summary>
+no data is being received from the devices, check the cables
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.DATA_SEQUENCE_REGAINED">
+            <summary>
+the plates have regained their data sequence
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.DATA_SEQUENCE_MISSED">
+            <summary>
+one or more plates have missing data sequence - data may be invalid
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.DATA_SYNCHRONIZE_LOST">
+            <summary>
+the plates have lost sync with each other - check sync cable
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.DATA_SYNCHRONIZING">
+            <summary>
+synchronizing, data not available yet
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.DATA_READ_NOT_STARTED">
+            <summary>
+Didn't start the data process - call Start
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.NO_DEVICES_FOUND">
+            <summary>
+There are apparently no devices attached.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.DATA_BUFFER_OVERFLOW">
+            <summary>
+the internal buffer has become saturated; either data polling isn't occuring often/fast enough,
+or else your callback is blocking for too long.Old data is now lost.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.NO_BUFFERS_SET">
+            <summary>
+No data buffers were allocated.
+</summary>
+        </member>
+        <member name="F:BertecDeviceNET.StatusErrors.NOERROR">
+            <summary>
+Generic no error.
+</summary>
+        </member>
+        <member name="M:bertec_SetInternalOption(System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.Int32)">
+Change certain internal functionality as defined by the settings keys. Depending on the setting the value parm may be a number or a 0/1 bool value 
+</member>
+        <member name="M:bertec_GetCurrentDeviceLogFilename(System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte*,System.Int32)">
+Puts a copy of the current device log filename into the buffer array, and returns the length. If either buffer or maxBufferSize is NULL or 0,
+    returns the needed minimum buffer size. 
+</member>
+        <member name="M:bertec_SetDeviceLogDirectory(System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.Int32)">
+Set or changes the output folder for the device logs and how long the logs should be kept. You should call this before anything else.
+    Defaults to the %temp%/bertec-device-logs folder and 7 days. Pass NULL for the outputFolder to use the default directory, and 0 to turn off age cleaning.
+</member>
+        <member name="M:bertec_ResetSyncCounters(System.Void*)">
+This will reset the internal sync counters to zero; this is used with dual synced plates 
+</member>
+        <member name="M:bertec_DeviceDataRate(System.Void*)">
+returns a dynamically computed value of the sample rate from the device, in hertz. This value is updated approximately every 100 ms 
+</member>
+        <member name="M:bertec_RedetectConnectedDevices(System.Void*)">
+signals the sdk that it should perform a device rescan and reinit all the devices. This is the same as physically unplugging and
+    then replugging all devices from the usb connection at the same time. The status BERTEC_LOOKING_FOR_DEVICES will be emitted. Does not block. 
+</member>
+        <member name="M:bertec_SetUsbThreadPriority(System.Void*,System.Int32)">
+set the usb thread reader priority. Advanced functionality, usually not needed. 
+</member>
+        <member name="M:bertec_SetUnifiedDataMode(System.Void*,System.Int32)">
+By default, the library will only present data via the callback or data polling when *all* devices have data, allowing for software sync,
+    device aggregation, and data averaging. This is typically the desired mode, but some applications may benefit from turning this functionality off.
+    If the enabled parameter is set to 0 (false), then the library will present data whenever *any* device has data, even if the others do not.
+    Software sync, device aggregation, and data averaging will *not* be performed in this mode. The data frame received by the callback or data polling
+    will be incomplete; your implimentation must be ready to check for and handle cases where device #1 presents data but #2 will not, and then some
+    frames later that will change to #2 has data but #1 does not; the data will appear to be unaligned with zero values for the no-data-present device structures.
+    The simplest method to handle this situtation is to check the channelData.count value for the device; if this is zero, there is no data for that device
+    in the current frame.
+    Turning off unified data implies that your application will do it's own post-processing of the data, using either the sequence number or timestamp
+    values to perform some kind of specialized alignment.
+    Call this function prior to calling Start in order to ensure that the data being received is in the format expected.
+    Using non-unified data mode with a single plate has no net effect.
+    Computed channels, device clocks and sync pin settings (bertec_SetComputedChannelsFlags, bertec_ResetDeviceClock, bertec_SetExternalClockMode, etc)
+    will still function if unified data is turned off; however, data averaging and aggregation (bertec_SetAveraging, bertec_SetAggregateDeviceMode) will not.
+
+</member>
+        <member name="M:bertec_ResetAllDeviceClocksAtTime(System.Void*,System.Int64,System.Int64)">
+Sets all of the devices' internal clock timers (bertec_AdditionalData.timestamp) to the same given value when the timestamp reaches the condition value.
+    This is only valid for devices that support the extended TIMESTAMP feature set; it will be ignored otherwise.
+
+</member>
+        <member name="M:bertec_ResetDeviceClockAtTime(System.Void*,System.Int32,System.Int64,System.Int64)">
+Sets the device's internal clock timer (bertec_AdditionalData.timestamp) to the given value when the timestamp reaches the condition value.
+    This is only valid for devices that support the extended TIMESTAMP feature set; it will be ignored otherwise.
+
+</member>
+        <member name="M:bertec_ResetAllDeviceClocks(System.Void*,System.Int64)">
+Sets all of the devices' internal clock timers (bertec_AdditionalData.timestamp) to the same given value.
+    This is only valid for devices that support the extended TIMESTAMP feature set; it will be ignored otherwise.
+
+</member>
+        <member name="M:bertec_ResetDeviceClock(System.Void*,System.Int32,System.Int64)">
+Sets the device's internal clock timer (bertec_AdditionalData.timestamp) to the given value.
+    This is only valid for devices that support the extended TIMESTAMP feature set; it will be ignored otherwise.
+
+</member>
+        <member name="M:bertec_SetSyncAuxPinValues(System.Void*,System.Int32,System.Int32,System.Int32)">
+Sets both the SYNC and AUX output pins to the passed values; these values only take effect if the given pin has been set to _INSTANT.
+    If the pin has not been set to _INSTANT, then the passed value is ignored. Note that you must pass both values even if you intend to only set one pin.
+    Only valid for devices that support the extended SYNC and AUX feature set. 
+</member>
+        <member name="M:bertec_SetAuxPinMode(System.Void*,System.Int32,bertec_AuxModeFlags)">
+Sets the AUX pin operating mode. This is only valid for devices that support the extended SYNC and AUX feature set. 
+</member>
+        <member name="M:bertec_SetSyncPinMode(System.Void*,System.Int32,bertec_SyncModeFlags)">
+Sets the SYNC pin operating mode. This is only valid for devices that support the extended SYNC and AUX feature set. Overrides the current master/slave relationship. 
+</member>
+        <member name="M:bertec_SetExternalClockMode(System.Void*,System.Int32,bertec_ClockSourceFlags)">
+Enables the ability for the SDK to clock the data stream against an external sync or clock source tied into the physical SYNC connection.
+    Setting this to any non-zero value overrides the internal 1000hz hardware clock, allowing the data to be either under or over sampled as needed.
+    Special note: using an external clock disables Averaging, low-pass Filtering, and multiple plate sync abilities; the SyncPinMode will be set to SYNC_NONE.
+    Your hardware needs will dictate if this mode is suitable for your configuration, and your hardware must be capable of delivering the proper
+    SYNC signal. Failure to do so will cause either random samples or no samples at all.
+
+</member>
+        <member name="M:bertec_SetEnableMasterSlaveMode(System.Void*,System.Int32)">
+Enables or disables the slave/master setting when more than one device connected. If the ENABLE flag is FALSE or if there is only one device connected,
+    the sync mode is set to SYNC_NONE (sampled) and internal hardware clock timers are reset (if present).
+    If the ENABLE flag is TRUE and there is two or more devices, then the first device is set as SYNC_OUT_MASTER and all other devices are set as SYNC_IN_SLAVE,
+    and internal hardware clock timers are reset (if present).
+    By default the Master/Slave mode is enabled and will automatically be set up if two or more devices are present. Calling this with FALSE after Init but before
+    calling Start will prevent this and cause all devices to run as SYNC_NONE. You can change this at any point during runtime by calling this with either TRUE
+    or FALSE. 
+    Calling this with TRUE is exactly the same as calling bertec_SetSyncPinMode with SYNC_OUT_MASTER for the first device and SYNC_IN_SLAVE for all others and
+    resetting all clock timers to 0.
+
+</member>
+        <member name="M:bertec_SetAggregateDeviceMode(System.Void*,System.Int32)">
+Enables or disables the ability to combine the output of two plates as one long virtual plate. This can be enabled or disabled at any point,
+    and the output from the callback or data block will change accordingly. If this mode is turned on then the bertec_DataFrame::deviceCount value
+    will be set to 1 even if there are more than one device connected, but Bertec_GetDeviceCount will always return the true number of devices
+    connected to the system.
+    In order for this to work properly both devices must be of the same type, same size, and have the same data channels. You should not try to
+    combine a balance plate with a force plate, or a sport plate with a functional model for example. 
+</member>
+        <member name="M:bertec_SetSubjectHeight(System.Void*,System.Single)">
+For the SwayAngle computation, the height of the person standing on the plate must be known. If this value is not set the program will
+    default to 1.5 meters (1500mm). This value CAN be changed while data is being collected. 
+</member>
+        <member name="M:bertec_SetComputedChannelsFlags(System.Void*,bertec_ComputedChannelFlags)">
+Enables or disables the ability to compute certain channels from the force device's FZ, MX, and MY values. If the device does not have the
+    appropriate channels, then setting this will have no effect. Note that turning on the COG and Sway Angle channels may incur a small CPU usage
+    penalty and require setting the subject height via bertec_SetSubjectHeight. The COP calculation is a simple moments over force function and
+    has little to no additional CPU overhead. The COP also does not need the subject height set in order to be used.
+    This function must be called after bertec_Init but before bertec_Start; calling this while devices are actively delivering data will result in an error. 
+</member>
+        <member name="M:bertec_GetMaxBufferedDataSize(System.Void*)">
+returns the currently set max buffer size, in samples. The default is 100 
+</member>
+        <member name="M:bertec_ChangeMaxBufferedDataSize(System.Void*,System.Int32)">
+by default the SDK will buffer up to 100 samples before discarding old data. If you believe your system cannot keep up or are using slow polling, then
+    increase this value. Be aware that larger values (ex: 5000) will dramatically increase memory usage which can impact your application.
+     Note that changing the size will force a discard of all currently buffered data, so do this before calling Start. 
+</member>
+        <member name="M:bertec_ClearBufferedData(System.Void*)">
+discards all current data in the buffer. 
+</member>
+        <member name="M:bertec_GetBufferedDataAvailable(System.Void*)">
+This will return how many blocks of data are in the internal buffer and can be read via bertec_ReadBufferedData.
+    This is a shortcut to calling bertec_ReadBufferedData(bHand,NULL)
+    Only use this if your code is using bertec_ReadBufferedData (polling) instead of data callbacks. 
+
+</member>
+        <member name="M:bertec_AllocateReadBufferedData(System.Void*,System.UInt32*)">
+To facilitate create and using the buffer data reader, these two convenience functions have been provided.  
+This is a convenience for use with bertec_ReadBufferedData; it simply allocates a buffer large enough to handle
+    the current number of connected devices. You must call free before exiting the sdk or re-allocating another buffer. 
+</member>
+        <member name="M:bertec_ReadBufferedData(System.Void*,bertec_DataFrame*,System.UInt32)">
+If not using callbacks, calling this will read one sample from the buffered data and return ether 1 (data read but more left) or 0 (did not read, no more left)
+    The dataFrame pointer MUST point to a valid bertec_DataFrame block, which will be filled in with the appropriate values. Passing NULL
+    will result in an error. If there are no more data blocks waiting to be read in the buffer this will return zero.
+    The dataFrameSize MUST be equal to the size of the bertec_DeviceData structure times the # of devices + the size of an int. 
+</member>
+        <member name="M:bertec_RegisterDeviceLogCallback(System.MulticastDelegate,System.Void*)">
+This will set a callback that is used whenever a new line of text is written to the device log file. The callback is called in the context of a worker
+    thread and as such your own code should handle things appropriately. Use this to monitor and display text diagnostic data. The leading digits are the 
+    millisecond timestamp when the message was generated (which will differ from when it is actually logged). 
+</member>
+        <member name="M:bertec_RegisterDeviceTimestampCallback(System.Void*,System.MulticastDelegate,System.Void*)">
+This will set a callback that is used whenever data is received from the USB connection, and is used to fill in the timestamp value.
+    This value will override the hardware timestamp from the device when the clock source is set to CLOCK_SOURCE_INTERNAL. If the clock source
+    is set to one of the three external signals, then this callback will be ignored.
+    The callback implementation must return a non-repeating timestamp value expressed in 8ths of a millisecond (1 ms = step of 8). This is done so that
+    the value passed here matches the output value in the bertec_AdditionalData.timestamp item.
+    The device number requesting the timestamp will be passed, along with the user data pointer if set. 
+</member>
+        <member name="M:bertec_RegisterDeviceSortCallback(System.Void*,System.MulticastDelegate,System.Void*)">
+This will set a callback that is used to sort the device order. By default they are sorted by usb hardware id/connection 
+</member>
+        <member name="M:bertec_RegisterDataCallback(System.Void*,System.MulticastDelegate,System.Void*)">
+callback registration functions
+    * callbacks are called from a separate thread.
+    * the callback is called with the user_data pointer passed to the register function
+    * a callback is identified by the (function pointer, user data pointer) pair -
+      the pair has to be unique.
+    * the registration functions safely ignore any requests to register existing
+      callbacks (i.e. same pair), or to unregister callbacks that are not
+      registered at the moment.
+    * if the userData value is not needed, it should be NULL.
+
+</member>
+        <member name="M:bertec_SetLowpassFiltering(System.Void*,System.Int32)">
+Perform low-pass filtering on the samples. SamplesToFilter should be &gt;=1. Setting to 0 or less turns it off. 
+</member>
+        <member name="M:bertec_SetAveraging(System.Void*,System.Int32)">
+Average the samples. SamplesToAverage should be &gt;= 2. Setting to 1 or less turns it off 
+</member>
+        <member name="M:bertec_GetZeroLevelNoiseValue(System.Void*,System.Int32,System.Int32)">
+returns the zero level noise value for a device. ZeroNow/EnableAutozero must have been called.
+    This is a computed value that can be used for advanced filtering. 
+    This is always a positive value; negative values indicate no zeroing or some other error. 
+</member>
+        <member name="M:bertec_GetAutozeroState(System.Void*)">
+returns the current autozering status. 
+</member>
+        <member name="M:bertec_SetEnableAutozero(System.Void*,System.Int32)">
+enable/disable the autozeroing of the plate, which occurs if the plate is loaded at less than 40 Newtons for
+    about 3.5 seconds. 
+</member>
+        <member name="M:bertec_ZeroNow(System.Void*)">
+zero the input against what the plate has loaded on it right now 
+</member>
+        <member name="M:bertec_GetDeviceChannels(System.Void*,System.Int32,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte*,System.UInt32)">
+convenience function to access the device's channels. Returns # of channels and fills the buffer with a copy of bertec_DeviceInfo::channelNames 
+</member>
+        <member name="M:bertec_GetDeviceModelNumber(System.Void*,System.Int32,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte*,System.UInt32)">
+convenience function to access the device's model number 
+</member>
+        <member name="M:bertec_GetDeviceSerialNumber(System.Void*,System.Int32,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte*,System.UInt32)">
+convenience function to access the device's serial number 
+</member>
+        <member name="M:bertec_GetDeviceInfo(System.Void*,System.Int32,bertec_DeviceInfo*,System.UInt32)">
+copies the current device info at the given index to the passed buffer. If there is no device at that index returns OUT OF RANGE 
+</member>
+        <member name="M:bertec_GetDeviceCount(System.Void*)">
+returns the number of devices connected to the system. Only valid once start has been called and devices have been found. 
+</member>
+        <member name="M:bertec_GetStatus(System.Void*)">
+returns the current status 
+</member>
+        <member name="M:bertec_Stop(System.Void*)">
+stops all data collection and disconnects from all devices 
+</member>
+        <member name="M:bertec_Start(System.Void*)">
+start the device detection and data collection 
+</member>
+        <member name="M:bertec_CheckHandle(System.Void*)">
+verifies that the handle passed is a legitimate bertec_Handle item. Returns FALSE if not. 
+</member>
+        <member name="M:bertec_Close(System.Void*)">
+close the library when it's no longer needed 
+</member>
+        <member name="M:bertec_Init">
+initialize the library, returns a handle 
+</member>
+        <member name="M:bertec_LibraryVersion">
+returns the version of the library. This should match BERTEC_LIBRARY_VERSION 
+</member>
+        <member name="T:bertec_StatusErrors">
+Defined errors and status values 
+</member>
+        <member name="T:bertec_HardwareIDs">
+The hardware id (HWID) is used to determine the type of hardware that is being communicating with. This the type of the hardware that the PC
+is directly communicating with, NOT the type of any further downstream device (ex: plate, plylon).
+If the PC is connected to a transducer, either via USB or directly, the hardware ID will be that of the transducer.
+If the PC is connected to a signal converter, the hardware ID will be that of the signal converter.
+Note that the id values are grouped in blocks of 10, and that the lower digit should be masked off. For example, any hardware id with a value
+in the 90-99 range should be considered an AM6817
+
+</member>
+        <member name="T:bertec_CommonDimensions">
+Common plate dimensions for the standard Bertec plates (Essential, Functional, and Sport). Other plate sizes exist; see the bertec_DeviceInfo structure.
+    These are all expressed in millimeters.
+    The placement of the Medial Malleolus line on the Functional plate aligns with an Essential when both plates are aligned on the front; to map the Y position
+    of the line between a Functional and Essential (normalize the position between the two), you will need to add in a constant value of
+    155mm (ESSENTIAL_MALLEOLUS_OFFSET_Y-FUNCTIONAL_MALLEOLUS_OFFSET_Y) to the computed Functional COPY value.
+    Note that you DO NOT NEED TO DO THIS unless you care about the stance position and the markings on the plate; if your applicaiton just cares about
+    the raw COP position, then you should NOT add any constant offsets and instead use the as-computed COP values.
+    The Lateral Calcaneus X offset values are provided as informational use only and will be negative for the left side of the plate and positive for the right.
+
+</member>
+        <member name="T:bertec_ComputedChannelFlags">
+Computed channels options. This is a bit field array. Note that the Sway Angle requires a set subject height to be correct 
+</member>
+        <member name="T:bertec_AutozeroStates">
+Autozero states as returned by bertec_GetAutozeroState 
+</member>
+        <member name="T:bertec_ClockSourceFlags">
+Internal/External Clock Source flags 
+</member>
+        <member name="T:bertec_AuxModeFlags">
+Aux pin mode flags 
+</member>
+        <member name="T:bertec_SyncModeFlags">
+Sync pin mode flags 
+</member>
+        <member name="T:bertec_DataFrame">
+A single block of data as sent via bertec_DataCallback or retrieved via bertec_ReadBufferedData. The frame contains a single sample of data from all of the devices. 
+</member>
+        <member name="T:bertec_DeviceData">
+A single device's block of data, both the channel data and the additional timestamp/sync data. This is part of the bertec_DataFrame 
+</member>
+        <member name="T:bertec_AdditionalData">
+Additional data that is part of the frame of data. Note that this is only value on devices with firmware that support these
+    (that is, hasInternalClock and hasAuxSyncPins are set). All other devices will return zero. 
+</member>
+        <member name="T:bertec_ChannelData">
+Channel data that is part of the frame of data. 
+</member>
+        <member name="T:bertec_DeviceInfo">
+information about a device 
+</member>
+        <member name="D:bertec_Handle">
+The version define is the version # of this Device DLL. You can check it via bertec_LibraryVersion
+    If it doesn't match what this one is, then structures and/or functions may have changed,
+    and you should proceed with caution. 
+This defines how many channels and devices that the DLL can support. Currently up to 32 devices with 32 channels each. 
+library handle 
+</member>
+    </members>
+</doc>
