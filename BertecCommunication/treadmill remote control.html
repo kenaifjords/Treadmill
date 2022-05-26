@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Contact: Kuba Ober, kuba@bertec.com" />
+  <title>Treadmill Remote Control Protocol</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <style type="text/css">
+  /*
+      Buttondown
+      A Markdown/MultiMarkdown/Pandoc HTML output CSS stylesheet
+      Author: Ryan Gray
+      Date: 15 Feb 2011
+      Revised: 21 Feb 2012
+      Minimized with csscompressor.com
+  */
+  
+  div#header,header
+  {
+  	border-bottom:1px solid #aaa;
+  	margin-bottom:.5em
+  }
+  
+  .title /* Pandoc title header (h1.title) */
+  {
+  	text-align:center
+  }
+  
+  .author,.date /* Pandoc author(s) and date headers (h2.author and h3.date) */
+  {
+  	text-align:center
+  }
+  
+  div#TOC,nav#TOC
+  {
+  	border-bottom:1px solid #aaa;
+  	margin-bottom:.5em
+  }
+  
+  @media print {
+  	div#TOC,nav#TOC
+  	{
+  		display:none
+  	}
+  }
+  
+  h1,h2,h3,h4,h5,h6
+  {
+  	font-family:"Helvetica Neue",Helvetica,"Liberation Sans",Calibri,Arial,sans-serif;
+  	page-break-after:avoid
+  }
+  
+  div div,section section /* Nested sections */
+  {
+  	margin-left:2em
+  }
+  
+  blockquote
+  {
+  	font-style:italic
+  }
+  
+  li > p /* Loosely spaced list item */
+  {
+  	margin-top:1em
+  }
+  
+  em > em /* Emphasis within emphasis: *This is all *emphasized* except that* */
+  {
+  	font-style:normal
+  }
+  
+  a /* All links */
+  {
+  	text-decoration:none
+  }
+  
+  @media screen {
+  	a:hover
+  	{
+  		text-decoration:underline
+  	}
+  }
+  
+  @media print {
+  	a
+  	{
+  		color:#000;
+  		background:transparent
+  	}
+  	
+  	a[href^="http://"]:after,a[href^="https://"]:after
+  	{
+  		content:" (" attr(href) ") ";
+  		font-size:90%
+  	}
+  }
+  
+  img
+  {
+  	vertical-align:middle
+  }
+  
+  div.figure /* Pandoc figure-style image */
+  {
+  	margin-left:auto;
+  	margin-right:auto;
+  	text-align:center;
+  	font-style:italic
+  }
+  
+  pre,code
+  {
+  	background-color:#fdf7ee;
+  	white-space:pre-wrap;
+  	white-space:-moz-pre-wrap!important;
+  	white-space:-pre-wrap;
+  	white-space:-o-pre-wrap;
+  	word-wrap:break-word
+  }
+  
+  pre /* Code blocks */
+  {
+  	padding:.5em;
+  	border-radius:5px;
+  	border:1px solid #aaa;
+  	margin-left:.5em;
+  	margin-right:.5em
+  }
+  
+  @media screen {
+  	pre
+  	{
+  		white-space:pre;
+  		overflow:auto;
+  		border:1px dotted #777
+  	}
+  }
+  
+  p > code,li > code /* Code spans in paragraphs and tight lists */
+  {
+  	padding-left:2px;
+  	padding-right:2px
+  }
+  
+  li > p code /* Code span in a loose list */
+  {
+  	padding:2px
+  }
+  
+  table
+  {
+  	border-collapse:collapse;
+  	border-spacing:0;
+  	border-bottom:2pt solid #000;
+  	border-top:2pt solid #000;
+  	margin-left:auto;
+  	margin-right:auto
+  }
+  
+  thead /* Entire table header */
+  {
+  	border-bottom:1pt solid #000;
+  	background-color:#eee
+  }
+  
+  tr.odd:hover,tr.even:hover /* Use .odd and .even classes to avoid styling rows in other tables */
+  {
+  	background-color:#eee
+  }
+  
+  td,th /* Table cells and table header cells */
+  {
+  	vertical-align:top;
+  	vertical-align:baseline;
+  	padding:.2em .5em
+  }
+  
+  th /* Table header cells */
+  {
+  	font-weight:700
+  }
+  
+  caption /* This is for a table caption tag,not the p.caption Pandoc uses in a div.figure */
+  {
+  	caption-side:top;
+  	border:none;
+  	font-size:.9em;
+  	font-style:italic;
+  	text-align:center;
+  	margin-bottom:.3em;
+  	padding-bottom:.2em
+  }
+  
+  dl /* The whole list */
+  {
+  	border-top:2pt solid #000;
+  	padding-top:.5em;
+  	border-bottom:2pt solid #000
+  }
+  
+  dt /* Definition term */
+  {
+  	font-weight:700
+  }
+  
+  dd+dt /* 2nd or greater term in the list */
+  {
+  	border-top:1pt solid #000;
+  	padding-top:.5em
+  }
+  
+  dd /* A definition */
+  {
+  	margin-bottom:.5em
+  }
+  
+  dd+dd /* 2nd or greater definition of a term */
+  {
+  	border-top:1px solid #000
+  }
+  
+  a.footnote,a.footnoteRef
+  {
+  	font-size:small;
+  	vertical-align:text-top
+  }
+  
+  @media print {
+  	a[href^="#fnref"],a.reversefootnote /* Pandoc,MultiMarkdown */
+  	{
+  		display:none
+  	}
+  }
+  
+  @media print {
+  	.noprint
+  	{
+  		display:none
+  	}
+  }
+  </style>
+</head>
+<body>
+<header>
+<h1 class="title">Treadmill Remote Control Protocol</h1>
+<p class="author">Contact: Kuba Ober, kuba@bertec.com</p>
+<p class="date">Revised: 04/17/2018</p>
+</header>
+<h2 id="introduction">Introduction</h2>
+<p>The Treadmill Control Panel can be remotely controlled using either TCP or UDP internet protocols.</p>
+<p>The remote control has to be enabled in the Settings dialog of the Treadmill Control Panel. This allows the treadmill control application to accept TCP connections if TCP protocol was chosen. The treadmill application will also send out feedback updates using the chosen protocol. Initially, any data packets it receives are discared.</p>
+<p>To fully activate the remote control, click the “Enable Remote Control” button in the Treadmill Control Panel. This enables the software to accept and act on the data it receives. Any manipulation of the controls by the user will cause further incoming data to be discarded, and the enable button will reappear.</p>
+<h2 id="example-code">Example Code</h2>
+<p>Please observe the following:</p>
+<ul>
+<li><p>DO NOT USE THE EXAMPLE CODE with a live subject on the belt!</p></li>
+<li><p>THE EXAMPLE CODE (“SOFTWARE”) IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></li>
+</ul>
+<p>There are three example remote control programs included for educational purposes only. All come with full source code, licensed as given in the source files.</p>
+<ul>
+<li>tm_set.m and tm_test.m are Matlab examples using the Instrument Toolbox;</li>
+<li>treadmill-remote.exe is a Qt-based example remote control panel;</li>
+<li>treadmill-remote.dll is a pure C library implementing the minimum functionality necessary to connect to the Treadmill Control Panel using Windows Sockets networking API. It can be used in prototype user applications, and is accessible from most programming languages.</li>
+</ul>
+<p>The treadmill-remote.exe program has an option of using the treadmill-remote.dll library. When running self-compiled treadmill-remote.exe, make sure that the library .dll file is in the same folder as treadmill-remote.exe.</p>
+<p>To minimize the size of the distributed code, the remote control program is not supplied pre-compiled into a separate executable. There is a shortcut that starts it using the main treadmill control panel executable.</p>
+<h2 id="how-to-compile-the-example-code">How to Compile the Example Code</h2>
+<p>The Matlab example code was tested with MATLAB R2014a and is in public domain, see <a href="">http://unlicense.org</a>. Invoke help tm_set to get usage information for the tm_set function. A usage example is given in tm_test.m.</p>
+<p>The accompanying source code is released under the terms of the BSD 3-Clause License, included at the top of each source file.</p>
+<p>Compilation requires the use of Qt toolkit, available from <a href="">http://qt-project.org/downloads</a>.</p>
+<p>There are two options when building the code:</p>
+<ol type="1">
+<li><p>Use Qt 5.x for Windows 32-bit MinGW. That package includes the Qt library, the MinGW C/C++ compilers and build tools, and the Qt Creator integrated development environment (IDE).</p></li>
+<li><p>Use Qt 5.x or Qt 4.8 for Windows for VS 20xx. You need to have a matching version of Visual Studio installed. Visual Studio Express is sufficient. The Qt Creator is bundled with Qt 5 - you can use it as the IDE to simplify building of Qt-based packages even when Visual Studio is the underlying compiler.</p></li>
+</ol>
+<p>The supplied example code will work with either Qt 4.8 or 5.x. Your choice of Qt version will be affected by the version of Visual Studio that you have:</p>
+<ul>
+<li>VS2012 or newer: Only Qt 5 is supported, unless you compile Qt 4.8 from sources yourself</li>
+<li>VS2010: Both Qt 4 and Qt 5 are supported</li>
+<li>VS2008: Only Qt 4 is supported</li>
+</ul>
+<p>The program will be built as release-remote.exe</p>
+<ul>
+<li><p>Compiling with a Visual Studio 2008 or Later Compiler</p>
+<p>After installing the Qt toolkit; open the Visual Studio Command Prompt and type:</p>
+<pre><code>  cd &quot;C:\Program Files\Bertec\Treadmill\Remote&quot;
+    ... or ...
+  cd &quot;C:\Program Files (x86)\Bertec\Treadmill\Remote&quot;
+  qmake
+  nmake</code></pre></li>
+<li><p>Compiling with Qt Creator with any Compiler Supported by Qt</p>
+<p>Open Qt Creator, on the Welcome pane click the “Open Project” button. Open the “C:Files-Remote-Qt.pro” project. Select the Qt version to build with when prompted. Press Ctrl-R to build and run the project.</p></li>
+<li><p>Compilation on Other Platforms</p>
+<p>The code should also work on unix and OS X platforms where Qt is installed. Ensure that the Qt libraries and development tools are installed. From the shell, changed into the source folder and run qmake followed by make or gmake.</p></li>
+</ul>
+<h2 id="packet-synchronization">Packet Synchronization</h2>
+<h3 id="setpoint-packets-user-application-to-treadmill-control-panel">Setpoint Packets (User Application to Treadmill Control Panel)</h3>
+<h4 id="tcpip">TCP/IP</h4>
+<p>There are no provisions in the packet format for packet boundary re-synchronization within the TCP/IP stream. It is important that all packets sent by the user application start on a 64-byte boundary in the TCP data stream.</p>
+<p>To minimize the latency in the transmission of the setpoint packets over TCP/IP, set the TCP_NODELAY option on the socket. The setting of this option only affects the sending of the setpoints from your code. Since the option only affects the end of the connection on which it is set, the Treadmill Control Panel sets the same option on its end of the connection. This ensures that the feedback packets will be sent to you over TCP/IP with minimum latency. This option only applies to TCP/IP connections. Setting it on a UDP/IP socket is an error.</p>
+<h4 id="udpip">UDP/IP</h4>
+<p>The packets must constitute complete UDP datagrams. This provides for implied synchronization – each datagram is examined separately. Packets split across multiple datagrams are discarded.</p>
+<h3 id="feedback-packets-treadmill-control-panel-to-user-application">Feedback Packets (Treadmill Control Panel to User Application)</h3>
+<p>Data received by the user application has to be decoded on 32-byte boundaries in the TCP/IP stream.</p>
+<p>With UDP, the user application must decode UDP datagrams separately.</p>
+<h2 id="data-format">Data Format</h2>
+<h3 id="notation">Notation</h3>
+<p>All multi-byte integers are sent big-endian (most significant byte first). All signed integers are coded in 2s-complement.</p>
+<pre><code>[{count x} &lt;u|s&gt; - u(nsigned)/s(igned) &lt;8|16&gt; - size in bits]</code></pre>
+<p>When not given, the default count is 1.</p>
+<pre><code>Belt 0 - right (front) belt
+Belt 1 - left (front) belt
+Belt 2 - right rear belt
+Belt 3 - left rear belt</code></pre>
+<p>All packets are notated using the custom notation as well as pseudo-C++-code:</p>
+<pre><code>enum BeltIndex { Right_Front = 0, Left_Front = 1, Right_Rear = 2, Left_Rear = 3 };</code></pre>
+<h3 id="setpoint-packets-to-be-sent-from-the-user-application">Setpoint Packets, To Be Sent From the User Application</h3>
+<pre><code>[u8]      format specifier (set to 0)
+[4 x s16] belt 0..3 speed in mm/s
+[4 x s16] belt 0..3 acceleration in mm/s^2
+[s16]     incline angle in 0.01 deg
+[4 x s16] 1s complement (bit-inverted) belt 0..3 speed in mm/s
+[4 x s16] 1s complement (bit-inverted) belt 0..3 acceleration in mm/s^2
+[s16]     1s complement (bit-inverted) incline angle in 0.01 deg
+[27 x u8] padding
+Size: 1 + 2*(16+2) + 27 = 28+36 = 64 bytes</code></pre>
+<p>C++ structure notation - assumes a packed structure:</p>
+<pre><code>struct TreadmillSetpoint {
+  uint8_t format = 0;
+  int16_t belt_speed[4];            //
+  int16_t belt_acceleration[4];     // 9 straight-coded values
+  int16_t incline_angle;            //
+  int16_t belt_speed_complement[4];         //
+  int16_t belt_acceleration_complement[4];  // 9 1s-complement values
+  int16_t incline_angle_complement;         //
+  uint8_t padding[27];
+};</code></pre>
+<p>The straight-coded and complement values must match <em>for all fields - whether a given treadmill have all belts and incline or not</em>. I.e.: each of the 9 complement values must be a bit-wise inversion of the straight-coded value; otherwise the packet is silently discarded.</p>
+<h3 id="feedback-packets-sent-from-the-treadmill-control-panel">Feedback Packets, Sent From the Treadmill Control Panel</h3>
+<pre><code>[u8]      format specifier (value is 0)
+[4 x s16] belt 0..3 speed in mm/s
+[s16]     incline angle in 0.01 deg
+[21 x u8] padding
+Size: 1 + (8+2) + 21 = 22 + 10 = 32 bytes</code></pre>
+<p>C++ structure notation - assumes a packed structure:</p>
+<pre><code>struct TreadmillFeedback {
+  uint8_t format = 0;
+  int16_t belt_speed[4];
+  int16_t incline_angle;
+  uint8_t padding[21];
+};</code></pre>
+<h3 id="example-setpoint-packet">Example Setpoint Packet</h3>
+<p>Assume following parameters:</p>
+<ul>
+<li>right belt speed: <span class="math inline">2.0 m/s = <code>0x07D0</code> mm/s</span>,</li>
+<li>left belt speed: <span class="math inline">1.0 m/s = <code>0x03E8</code> mm/s</span>,</li>
+<li>right belt acceleration: <span class="math inline">0.25 m/s<sup>2</sup> = <code>0x00FA</code> mm/s<sup>2</sup></span>,</li>
+<li>left belt acceleration: <span class="math inline">0.5 m/s<sup>2</sup> = <code>0x01F4</code> mm/s<sup>2</sup></span>.</li>
+</ul>
+<p>The following packet results:</p>
+<pre><code>struct S {
+  uint8_t format = 0;
+  int16_t belt_speed[4] =       { 0x7D0, 0x3E8, 0, 0 };
+  int16_t belt_acceleration[4] = { 0xFA, 0x1F4, 0, 0 };
+  int16_t incline_angle = 0;
+  int16_t belt_speed_complement[4] =        { 0xF82F, 0xFC17, 0xFFFF, 0xFFFF };
+  int16_t belt_acceleration_complement[4] = { 0xFF05, 0xFE0B, 0xFFFF, 0xFFFF };
+  int16_t incline_angle_complement = 0xFFFF;
+  uint8_t padding[27];
+};</code></pre>
+<p>The packet has following binary contents, expressed in hexadecimal notation (in big-endian or natural order).</p>
+<pre><code>Grouped According To Function
+
+00 * 07D0 03E8 0000 0000 * 00FA 01F4 0000 0000 * 0000
+   * F82F FC17 FFFF FFFF * FF05 FE0B FFFF FFFF * FFFF
+00   0000 0000 0000 0000 0000 0000 0000 0000
+     0000 0000 0000 0000 0000
+
+Grouped in 16-bit Groups
+
+0007 D003 E800 0000 0000 FA01 F400 0000
+0000 00F8 2FFC 17FF FFFF FFFE 05FE 0BFF
+FFFF FFFF FF00 0000 0000 0000 0000 0000
+0000 0000 0000 0000 0000 0000 0000 0000   </code></pre>
+</body>
+</html>
