@@ -1,8 +1,6 @@
-function animation_vicon_stick(trajdataonly, animateyes)
+function animation_vicon_stick(trajdataonly, trajtime, animateyes)
 %Markers
 %LASI;RASI;LPSI;RPSI;LTHI;LKNE;LTIB;LANK;LHEE;LTOE;RTHI;RKNE;RTIB;RANK;RHEE;RTOE	
-
-trajdataonly=trajdata(:,3:end);
 pLasis=trajdataonly(:,1:3);
 pRasis=trajdataonly(:,4:6);
 pLpsis=trajdataonly(:,7:9);
@@ -40,7 +38,8 @@ xLuleg=[pLknee(:,1) pLasis(:,1) ];    yLuleg=[pLknee(:,2) pLasis(:,2) ];    zLul
 % ztrunk=[pLhip(:,3)+(pRhip(:,3)-pLhip(:,3))/2 sternum(:,3)];
 %%
 i=100;
-figure('Name',sprintf('3D Stick Figure for file %s  ',filename));
+figure();
+% figure('Name',sprintf('3D Stick Figure for file %s  ',filename));
 set(gcf,'DoubleBuffer','on');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 subplot(2,2,1)
@@ -75,7 +74,8 @@ text(0.3,0.5,num2str(trajtime(i)),'FontSize',36,'Color','r')
 %%
 
 if animateyes
-figure('Name',sprintf('3D Stick Figure for file %s  ',filename));
+figure()
+% figure('Name',sprintf('3D Stick Figure for file %s  ',filename));
 set(gcf,'DoubleBuffer','on');
 
 for i=1:round((length(trajtime)/100)):length(trajtime)  %time frame counter
@@ -112,6 +112,6 @@ pause(0.05)
 end
 end
 
-
+end
 
 
