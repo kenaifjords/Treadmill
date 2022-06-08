@@ -10,6 +10,7 @@ path = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter\c
 
 subjects = {'RMM'}; % RMM
 conditions = {'LowEffort','HighEffort'};
+
 for subj = 1:length(subjects)
     TM(subj).subject = subjects(subj);
     for cond = 1:length(conditions)
