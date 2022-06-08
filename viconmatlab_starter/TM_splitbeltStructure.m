@@ -3,7 +3,8 @@ close all
 clear all
 
 global homepath
-homepath = 'F:\Users\Rachel\viconmatlab_starter';
+homepath = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
+% homepath = 'F:\Users\Rachel\viconmatlab_starter';
 
 subjects = {'RMM'};
 fastlegs = { 'R' }; % corresponds to belt 1
@@ -240,6 +241,8 @@ for subj = 1:length(subjects)
             end
         end
         plot(TM(subj).step(cond).toeoffR(start_stepthresplotidx:end_stepthresplotidx),'rd')
+        
+        
         %% use COP (from camera -- heel) and force to determine split/tied
         
         
