@@ -2,7 +2,7 @@ function [p] = vicon_markers(trajdataonly)
 %Markers
 %LASI;RASI;LPSI;RPSI;LTHI;LKNE;LTIB;LANK;LHEE;LTOE;RTHI;RKNE;RTIB;RANK;RHEE;RTOE	
 
-trajdataonly=trajdata(:,3:end);
+% trajdataonly=trajdata(:,3:end);
 p.Lasis=trajdataonly(:,1:3);
 p.Rasis=trajdataonly(:,4:6);
 p.Lpsis=trajdataonly(:,7:9);
@@ -21,15 +21,31 @@ p.Rheel=trajdataonly(:,43:45);
 p.Rtoe=trajdataonly(:,46:48);
 
 %%%create segment line coordinates
-xRfoot=[pRankle(:,1) pRheel(:,1) pRtoe(:,1) pRankle(:,1)];   yRfoot=[pRankle(:,2) pRheel(:,2) pRtoe(:,2) pRankle(:,2)];   zRfoot=[pRankle(:,3) pRheel(:,3) pRtoe(:,3) pRankle(:,3)]; 
-xRlleg=[pRankle(:,1) pRtibia(:,1) pRknee(:,1) ];  yRlleg=[pRankle(:,2) pRtibia(:,2) pRknee(:,2) ];  zRlleg=[pRankle(:,3) pRtibia(:,3) pRknee(:,3) ]; %line from ankle to knee
-xRuleg=[pRknee(:,1) pRasis(:,1) ];    yRuleg=[pRknee(:,2) pRasis(:,2) ];    zRuleg=[pRknee(:,3) pRasis(:,3) ];   %line from knee to hip
+xRfoot=[p.Rankle(:,1) p.Rheel(:,1) p.Rtoe(:,1) p.Rankle(:,1)];   
+yRfoot=[p.Rankle(:,2) p.Rheel(:,2) p.Rtoe(:,2) p.Rankle(:,2)];   
+zRfoot=[p.Rankle(:,3) p.Rheel(:,3) p.Rtoe(:,3) p.Rankle(:,3)]; 
 
-xhh=[pRasis(:,1) pLasis(:,1) pLpsis(:,1) pRpsis(:,1) pRasis(:,1)];        yhh=[pRasis(:,2) pLasis(:,2)  pLpsis(:,2) pRpsis(:,2) pRasis(:,2) ];        zhh=[pRasis(:,3) pLasis(:,3)  pLpsis(:,3) pRpsis(:,3) pRasis(:,3)];       %line from knee to hip
+xRlleg=[p.Rankle(:,1) p.Rtibia(:,1) p.Rknee(:,1) ];  
+yRlleg=[p.Rankle(:,2) p.Rtibia(:,2) p.Rknee(:,2) ];  
+zRlleg=[p.Rankle(:,3) p.Rtibia(:,3) p.Rknee(:,3) ]; %line from ankle to knee
 
-xLfoot=[pLtoe(:,1) pLankle(:,1) pLheel(:,1) pLtoe(:,1) ];   yLfoot=[pLtoe(:,2) pLankle(:,2) pLheel(:,2) pLtoe(:,2) ];   zLfoot=[pLtoe(:,3) pLankle(:,3) pLheel(:,3) pLtoe(:,3) ];
-xLlleg=[pLankle(:,1) pLtibia(:,1) pLknee(:,1) ];  yLlleg=[pLankle(:,2) pLtibia(:,2) pLknee(:,2) ];  zLlleg=[pLankle(:,3) pLtibia(:,3) pLknee(:,3) ]; %line from ankle to knee
-xLuleg=[pLknee(:,1) pLasis(:,1) ];    yLuleg=[pLknee(:,2) pLasis(:,2) ];    zLuleg=[pLknee(:,3) pLasis(:,3) ];   %line from knee to hip
+xRuleg=[p.Rknee(:,1) p.Rasis(:,1) ];    
+yRuleg=[p.Rknee(:,2) p.Rasis(:,2) ];    
+zRuleg=[p.Rknee(:,3) p.Rasis(:,3) ];   %line from knee to hip
+
+xhh=[p.Rasis(:,1) p.Lasis(:,1) p.Lpsis(:,1) p.Rpsis(:,1) p.Rasis(:,1)];        
+yhh=[p.Rasis(:,2) p.Lasis(:,2)  p.Lpsis(:,2) p.Rpsis(:,2) p.Rasis(:,2) ];        
+zhh=[p.Rasis(:,3) p.Lasis(:,3)  p.Lpsis(:,3) p.Rpsis(:,3) p.Rasis(:,3)];       %line from knee to hip
+
+xLfoot=[p.Ltoe(:,1) p.Lankle(:,1) p.Lheel(:,1) p.Ltoe(:,1) ];   
+yLfoot=[p.Ltoe(:,2) p.Lankle(:,2) p.Lheel(:,2) p.Ltoe(:,2) ];   
+zLfoot=[p.Ltoe(:,3) p.Lankle(:,3) p.Lheel(:,3) p.Ltoe(:,3) ];
+xLlleg=[p.Lankle(:,1) p.Ltibia(:,1) p.Lknee(:,1) ];  
+yLlleg=[p.Lankle(:,2) p.Ltibia(:,2) p.Lknee(:,2) ];  
+zLlleg=[p.Lankle(:,3) p.Ltibia(:,3) p.Lknee(:,3) ]; %line from ankle to knee
+xLuleg=[p.Lknee(:,1) p.Lasis(:,1) ];    
+yLuleg=[p.Lknee(:,2) p.Lasis(:,2) ];    
+zLuleg=[p.Lknee(:,3) p.Lasis(:,3) ];   %line from knee to hip
 
 
 % xsternum=[sternum(:,1) lclavicle(:,1) rclavicle(:,1) sternum(:,1)];
@@ -39,5 +55,5 @@ xLuleg=[pLknee(:,1) pLasis(:,1) ];    yLuleg=[pLknee(:,2) pLasis(:,2) ];    zLul
 % ytrunk=[pLhip(:,2)+(pRhip(:,2)-pLhip(:,2))/2 sternum(:,2)];
 % ztrunk=[pLhip(:,3)+(pRhip(:,3)-pLhip(:,3))/2 sternum(:,3)];
 
-
+end
 

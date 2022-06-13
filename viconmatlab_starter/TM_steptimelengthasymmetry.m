@@ -2,10 +2,10 @@
 devicefs = 1000; % bertec frames per second
 trajfs = 100; % vicon camera frames per second
 
-homepath = 'F:\Users\Rachel\viconmatlab_starter';
-% homepath = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
-path = 'F:\Users\Rachel\viconmatlab_starter\csvData\';
-% path = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter\csvData\';
+% homepath = 'F:\Users\Rachel\viconmatlab_starter';
+homepath = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
+% path = 'F:\Users\Rachel\viconmatlab_starter\csvData\';
+path = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter\csvData\';
 
 subjects = {'RMM'}; % RMM
 conditions = {'LowEffort','HighEffort'};
@@ -85,7 +85,6 @@ for subj = 1:length(subjects)
         tofp2=time(ind_tofp2);
 
         %% Calculate steplength, steptime, and steplength asymmetry
-        % 
 
         i=1; ii = 1; % added ii to get around equal indices on the first trial
         clear steptime1 steptime2
@@ -105,14 +104,12 @@ for subj = 1:length(subjects)
             elseif hsfp1(ii)>hsfp2(ii) %fp2 strikes first so take its second heel strike
              steptime2(i)= hsfp2(i+1)-hsfp1(i); 
             end
-               disp(num2str(i))
             %step time on belt 1 (right)
              if hsfp2(ii)<hsfp1(ii)   %fp2 strikes first
              steptime1(i)= hsfp1(i)-hsfp2(i);
             elseif hsfp2(ii)>hsfp1(ii) %fp1 strikes first so take its second heel strike
              steptime1(i)= hsfp1(i+1)-hsfp2(i);
              end
-            disp(num2str(steptime1(i)))
             i=i+1;
             if hsfp1(ii) == hsfp2(ii)
                 ii = ii+1;

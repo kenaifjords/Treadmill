@@ -248,5 +248,5 @@ for subj = 1:length(subjects)
         
     end
 end
-
+save('TM', TM)
     
