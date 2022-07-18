@@ -14,13 +14,21 @@ else()
     )
 endif()
 
+# Allow selecting static or dynamic
+# https://cmake.org/cmake/help/latest/guide/tutorial/Selecting%20Static%20or%20Shared%20Libraries.html#step-9-selecting-static-or-shared-libraries
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
 # set(CMAKE_CXX_STANDARD 11)
 add_executable(DemoLinkageExe main.cpp)
 
 # Load the library into CMake
 # We may be able to call "regsvr32 BertecDevice.lib", but that fails on all of them so far
 # TODO determine when to use the x64 directory
-add_library(BertecDevice ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019/x64/BertecDevice.lib)
+if(${BUILD_SHARED_LIBS})
+    add_library(BertecDevice STATIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019/x64/BertecDevice.dll)
+else()
+    add_library(BertecDevice  SHARED ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019/x64/BertecDevice.lib)
+endif()
 
 # Create an alias (modern cmake style) so we can be sure it is found for linking
 add_library(Bertec::BertecDevice ALIAS BertecDevice)
