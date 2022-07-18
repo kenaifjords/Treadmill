@@ -20,15 +20,15 @@ add_executable(DemoLinkageExe main.cpp)
 # Load the library into CMake
 # We may be able to call "regsvr32 BertecDevice.lib", but that fails on all of them so far
 # TODO determine when to use the x64 directory
-add_library(Bertec ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019/BertecDevice.lib)
+add_library(BertecDevice ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019/x64/BertecDevice.lib)
 
 # Create an alias (modern cmake style) so we can be sure it is found for linking
-add_library(Bertec::bertec ALIAS Bertec)
+add_library(Bertec::BertecDevice ALIAS BertecDevice)
 # Because CMake cannot determine the linker language on it's own, set it to C++ here
-set_target_properties(Bertec PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(BertecDevice PROPERTIES LINKER_LANGUAGE CXX)
 
 # Now we include directories, again, using brittle absolute paths
-target_include_directories(Bertec PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019)
+target_include_directories(BertecDevice PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019)
 
 # Finally, link the Bertec Library to the add_executable
-target_link_libraries(DemoLinkageExe PUBLIC Bertec::bertec)
+target_link_libraries(DemoLinkageExe PUBLIC Bertec::BertecDevice)
