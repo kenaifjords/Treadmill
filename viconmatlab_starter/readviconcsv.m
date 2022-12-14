@@ -1,16 +1,19 @@
 function[devicedata,trajdata] = readviconcsv(path,filename)% mfile to load .csv vicon files
 global homepath
+homepath = pwd;
 % close all 
 % clearvars 
 %% Get the path to a CSV file
-% [filename, path] = uigetfile('*.csv');
-% csvpath = fullfile(path,filename);
+[filename, path] = uigetfile('*.csv');
+csvpath = fullfile(path,filename);
 %csvpath = 'Dynamic 01.csv';
 %%
-csvfile = strcat(filename,'.csv');
+% csvfile = strcat(filename,'.csv');
+csvfile = filename;
 cd(path);
 
-fid = fopen(csvfile{1,1});
+% fid = fopen(csvfile{1,1});
+fid = fopen(csvfile(1:length(csvfile)));
 %fid = fopen(files{headerindex});
 
 %%
@@ -50,9 +53,13 @@ while ~feof(fid) %1
     devrowend= i;
     i=i+1;
 end
-opts = detectImportOptions(csvfile{1,1});
+% opts = detectImportOptions(csvfile{1,1});
+opts = detectImportOptions(csvfile)%(1:length(csvfile)));
+
 opts.DataLines = [5 devrowend];
-devicedata = readmatrix(csvfile{1,1},opts);
+% devicedata = readmatrix(csvfile{1,1},opts);
+devicedata = readmatrix(csvfile,opts);
+
 % devicedata=readmatrix(csvfile{1,1},'Range',[5 1 devrowend Ndev]);
 
 if isempty(findstr(devicefss,','))
@@ -70,9 +77,13 @@ if trajrowstart>1
             elseif i==trajrowstart+4 trajunits=config{i};
         end
     end
-    opts = detectImportOptions(csvfile{1,1});
+%     opts = detectImportOptions(csvfile{1,1});
+    opts = detectImportOptions(csvfile);
+
     opts.DataLines = trajrowstart+5;
-    trajdata = readmatrix(csvfile{1,1},opts);
+%     trajdata = readmatrix(csvfile{1,1},opts);
+    trajdata = readmatrix(csvfile,opts);
+
 %     trajdata=readmatrix(csvfile{1,1},'Range',trajrowstart+5);
     
     if isempty(findstr(trajfss,','))
@@ -84,5 +95,7 @@ if trajrowstart>1
 end
 fclose(fid); 
 cd(homepath)
-fprintf('File processed successfully:  %s.\n',csvfile{1,1});
+% fprintf('File processed successfully:  %s.\n',csvfile{1,1});
+fprintf('File processed successfully:  %s.\n',filename);
+
 end

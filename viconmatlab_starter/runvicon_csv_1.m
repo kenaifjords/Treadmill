@@ -6,7 +6,7 @@ clear all
 animateyes=1;
 %% Read in vicon data from CSV file
 
-readviconcsv
+readviconcsv_1
 
 %% Sort Data
 %Forecplate1 (Right?) (XYZ?) I think Z is up/down b/c COP is zero; Y maybe

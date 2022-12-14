@@ -1,12 +1,18 @@
 % mfile to load .csv vicon files
-
+global homepath
+homepath = pwd; %'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
 close all 
 clear all 
 
 animateyes=1;
+path = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
+%homepath;%,'csvData')
+filename = 'CJG_miniSplotBelt.csv';
+devicefs = 1000; %1000 Hz for the treadmill, 100Hz for cameras
+trajfs = 100; %  100Hz for cameras
 %% Read in vicon data from CSV file
 
-readviconcsv
+[devicedata,trajdata] = readviconcsv(path,filename);
 
 %% Sort Data
 %Forecplate1 (Left)  Z is up/down b/c COP is zero; Y is in the direction of
@@ -69,7 +75,7 @@ if animateyes
 figure
 subplot(121)
 plot(time(1),data(1,3),'b.')
-axis([time(round(length(time)/tport)) time(round(2*length(time)/tport)) 0 max(data(:,3))])
+% axis([time(round(length(time)/tport)) time(round(2*length(time)/tport)) 0 max(-data(:,3))])
 xlabel('Time (s)')
 ylabel('Vertical Force (N)')
 hold on
@@ -77,7 +83,7 @@ hold on
 subplot(122)
 plot(data(1,7),data(1,8),'b.')
 %axis([ min([min(data(:,8)) min(data(:,16))]) max([max(data(:,8)) max(data(:,16))])  min([min(data(:,7)) min(data(:,15))]) max([max(data(:,7)) max(data(:,15))])])
-axis([ min([min(data(:,7)) min(data(:,15))]) max([max(data(:,7)) max(data(:,15))])  min([min(data(:,8)) min(data(:,16))]) max([max(data(:,8)) max(data(:,16))])])
+% axis([ min([min(data(:,7)) min(data(:,15))]) max([max(data(:,7)) max(data(:,15))])  min([min(data(:,8)) min(data(:,16))]) max([max(data(:,8)) max(data(:,16))])])
 xlabel('Lateral COP')
 ylabel('Sagittal COP')
 hold on 
@@ -126,7 +132,7 @@ title('Z forces')
 
 
 %% Marker data
-vicon_stick
+vicon_stick(trajdata,trajtime, animateyes)
 
 %%
 figure

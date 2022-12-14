@@ -1,8 +1,8 @@
-function animation_vicon_stick(trajdataonly, animateyes)
+function animation_vicon_stick(trajdataonly,trajtime, animateyes)
 %Markers
 %LASI;RASI;LPSI;RPSI;LTHI;LKNE;LTIB;LANK;LHEE;LTOE;RTHI;RKNE;RTIB;RANK;RHEE;RTOE	
 
-trajdataonly=trajdata(:,3:end);
+% trajdataonly=trajdata(:,3:end);
 pLasis=trajdataonly(:,1:3);
 pRasis=trajdataonly(:,4:6);
 pLpsis=trajdataonly(:,7:9);
@@ -21,7 +21,7 @@ pRheel=trajdataonly(:,43:45);
 pRtoe=trajdataonly(:,46:48);
 
 %%%create segment line coordinates
-xRfoot=[pRankle(:,1) pRheel(:,1) pRtoe(:,1) pRankle(:,1)];   yRfoot=[pRankle(:,2) pRheel(:,2) pRtoe(:,2) pRankle(:,2)];   zRfoot=[pRankle(:,3) pRheel(:,3) pRtoe(:,3) pRankle(:,3)]; 
+xRfootvicon stick s===[pRankle(:,1) pRheel(:,1) pRtoe(:,1) pRankle(:,1)];   yRfoot=[pRankle(:,2) pRheel(:,2) pRtoe(:,2) pRankle(:,2)];   zRfoot=[pRankle(:,3) pRheel(:,3) pRtoe(:,3) pRankle(:,3)]; 
 xRlleg=[pRankle(:,1) pRtibia(:,1) pRknee(:,1) ];  yRlleg=[pRankle(:,2) pRtibia(:,2) pRknee(:,2) ];  zRlleg=[pRankle(:,3) pRtibia(:,3) pRknee(:,3) ]; %line from ankle to knee
 xRuleg=[pRknee(:,1) pRasis(:,1) ];    yRuleg=[pRknee(:,2) pRasis(:,2) ];    zRuleg=[pRknee(:,3) pRasis(:,3) ];   %line from knee to hip
 
@@ -40,7 +40,7 @@ xLuleg=[pLknee(:,1) pLasis(:,1) ];    yLuleg=[pLknee(:,2) pLasis(:,2) ];    zLul
 % ztrunk=[pLhip(:,3)+(pRhip(:,3)-pLhip(:,3))/2 sternum(:,3)];
 %%
 i=100;
-figure('Name',sprintf('3D Stick Figure for file %s  ',filename));
+% figure('Name',sprintf('3D Stick Figure for file %s  ',filename));
 set(gcf,'DoubleBuffer','on');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 subplot(2,2,1)
@@ -75,7 +75,7 @@ text(0.3,0.5,num2str(trajtime(i)),'FontSize',36,'Color','r')
 %%
 
 if animateyes
-figure('Name',sprintf('3D Stick Figure for file %s  ',filename));
+% figure('Name',sprintf('3D Stick Figure for file %s  ',filename));
 set(gcf,'DoubleBuffer','on');
 
 for i=1:round((length(trajtime)/100)):length(trajtime)  %time frame counter
