@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.14.3)
 project(ClosedLoopFeedback)
 
-set(BERTEC_FOLDER_NAME "BertecSDKOctober2019")
+set(BERTEC_FOLDER_NAME "BertecSDKOctober2022")
 set(BERTEC_ZIP_NAME "${BERTEC_FOLDER_NAME}.zip")
-if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019)
+if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME})
     message(STATUS "Bertec is pre-downloaded, skipping download. Delete build directory if you want to re-download.")
 else()
     message(STATUS "Downloading Bertec SDK...")
-    file(DOWNLOAD https://downloads.bertec.com/Bertec_Device_SDK_October_2019.zip ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_ZIP_NAME} SHOW_PROGRESS)
+    file(DOWNLOAD https://downloads.bertec.com/Bertec_Device_SDK_August_2022.zip ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_ZIP_NAME} SHOW_PROGRESS)
     file(ARCHIVE_EXTRACT INPUT ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_ZIP_NAME}
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME}
         VERBOSE
     )
 endif()
@@ -25,9 +25,9 @@ add_executable(DemoLinkageExe main.cpp)
 # We may be able to call "regsvr32 BertecDevice.lib", but that fails on all of them so far
 # TODO determine when to use the x64 directory
 if(${BUILD_SHARED_LIBS})
-    add_library(BertecDevice STATIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019/x64/BertecDevice.dll)
+    add_library(BertecDevice STATIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME}/x64/BertecDevice.dll)
 else()
-    add_library(BertecDevice  SHARED ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019/x64/BertecDevice.lib)
+    add_library(BertecDevice  SHARED ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME}/x64/BertecDevice.lib)
 endif()
 
 # Create an alias (modern cmake style) so we can be sure it is found for linking
@@ -36,7 +36,7 @@ add_library(Bertec::BertecDevice ALIAS BertecDevice)
 set_target_properties(BertecDevice PROPERTIES LINKER_LANGUAGE CXX)
 
 # Now we include directories, again, using brittle absolute paths
-target_include_directories(BertecDevice PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/BertecSDKOctober2019)
+target_include_directories(BertecDevice PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME})
 
 # Finally, link the Bertec Library to the add_executable
 target_link_libraries(DemoLinkageExe PUBLIC Bertec::BertecDevice)
