@@ -2,14 +2,14 @@
 global homepath
 homepath = pwd; %'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
 close all 
-clear all 
+% clear all 
 
-animateyes=1;
+animateyes=0;
 path = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
 %homepath;%,'csvData')
 filename = 'CJG_miniSplotBelt.csv';
 devicefs = 1000; %1000 Hz for the treadmill, 100Hz for cameras
-trajfs = 100; %  100Hz for cameras
+trajfs = 100; %   100Hz for cameras
 %% Read in vicon data from CSV file
 
 [devicedata,trajdata] = readviconcsv(path,filename);
@@ -235,16 +235,16 @@ title('Asymmetry (R-L)')
 ylabel('Length (mm)')
 xlabel('Time (s)')
 
-%figure
-%subplot(211)
-%plot(steptime1)
-%title('Step Times')
-%hold on
-%plot(steptime2,'g')
-%ylabel('Time (s)')
-%legend('Right','Left')
+figure
+subplot(211)
+plot(steptime1)
+title('Step Times')
+hold on
+plot(steptime2,'g')
+ylabel('Time (s)')
+legend('Right','Left')
  
-%subplot(212)
-%plot(steptime_asym)
-%title('Asymmetry (R-L)')
-%ylabel('Time (s)')
+subplot(212)
+plot(steptime_asym)
+title('Asymmetry (R-L)')
+ylabel('Time (s)')

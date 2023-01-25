@@ -17,19 +17,6 @@ readviconcsv_1
 dataraw=devicedata;
 dataraw(:,[3:5 6:8 18:20 21:23])=-dataraw(:,[3:5 6:8 18:20 21:23]);
 
-% F1 = [dataraw(:,3) dataraw(:,4) dataraw(:,5)];  %N, 
-% M1 = [dataraw(:,6) dataraw(:,7) dataraw(:,8)];  %Nmm
-% COP1 = [dataraw(:,9) dataraw(:,10) ]; %mm
-% 
-% %Forecplate2 (Left?)
-% % F2 = [-dataraw(:,18:20)];  %?N, 
-% % M2 = [-dataraw(:,21:23)];  %?Nmm
-% % COP2 =[ -dataraw(:,24:26)]; %mm
-% 
-% F2 = [dataraw(:,18) dataraw(:,19) dataraw(:,20)];  %N, 
-% M2 = [dataraw(:,21) dataraw(:,22) dataraw(:,23)];  %Nmm
-% COP2 = [dataraw(:,24) dataraw(:,25) ]; %mm
-
 % Filter
 % Select only (16 col) : F1xF1yF1zM1xM1yM1zCOP1xCOP1yF2xF2yF2zM2xM2yM2zCOP2xCOP2y
 dataraw = dataraw(:,[3:10 18:25]);
@@ -63,58 +50,58 @@ timeold=time;
 
 %% Animation
 tport=100;
-if animateyes
-    
-figure
-subplot(121)
-plot(time(1),data(1,3),'b.')
-axis([time(round(length(time)/tport)) time(round(2*length(time)/tport)) 0 max(data(:,3))])
-xlabel('Time (s)')
-ylabel('Vertical Force (N)')
-hold on
-
-subplot(122)
-plot(data(1,7),data(1,8),'b.')
-%axis([ min([min(data(:,8)) min(data(:,16))]) max([max(data(:,8)) max(data(:,16))])  min([min(data(:,7)) min(data(:,15))]) max([max(data(:,7)) max(data(:,15))])])
-axis([ min([min(data(:,7)) min(data(:,15))]) max([max(data(:,7)) max(data(:,15))])  min([min(data(:,8)) min(data(:,16))]) max([max(data(:,8)) max(data(:,16))])])
-xlabel('Lateral COP')
-ylabel('Sagittal COP')
-hold on 
-
-for i=round(1*length(time)/tport):2:round(2*length(time)/tport)
-    
-    subplot(121)
-    plot(time(i-5:i),data(i-5:i,3),'b')
-    hold on
-    plot(time(i-5:i),data(i-5:i,11),'r')
-    
-    subplot(122)
-    if (data(i-5,3)) > 400
-        plot(data(i-5:i,7),data(i-5:i,8),'b')
-        hold on
-    end
-    if (data(i-5,11)) > 400
-        plot(data(i-5:i,15),data(i-5:i,16),'r')
-        hold on
-    end
-    
-    pause(0.001)
-end
-end
+% if animateyes
+%     
+% figure
+% subplot(121)
+% plot(time(1),data(1,3),'b.')
+% axis([time(round(length(time)/tport)) time(round(2*length(time)/tport)) 0 max(data(:,3))])
+% xlabel('Time (s)')
+% ylabel('Vertical Force (N)')
+% hold on
+% 
+% subplot(122)
+% plot(data(1,7),data(1,8),'b.')
+% %axis([ min([min(data(:,8)) min(data(:,16))]) max([max(data(:,8)) max(data(:,16))])  min([min(data(:,7)) min(data(:,15))]) max([max(data(:,7)) max(data(:,15))])])
+% axis([ min([min(data(:,7)) min(data(:,15))]) max([max(data(:,7)) max(data(:,15))])  min([min(data(:,8)) min(data(:,16))]) max([max(data(:,8)) max(data(:,16))])])
+% xlabel('Lateral COP')
+% ylabel('Sagittal COP')
+% hold on 
+% 
+% for i=round(1*length(time)/tport):2:round(2*length(time)/tport)
+%     
+%     subplot(121)
+%     plot(time(i-5:i),data(i-5:i,3),'b')
+%     hold on
+%     plot(time(i-5:i),data(i-5:i,11),'r')
+%     
+%     subplot(122)
+%     if (data(i-5,3)) > 400
+%         plot(data(i-5:i,7),data(i-5:i,8),'b')
+%         hold on
+%     end
+%     if (data(i-5,11)) > 400
+%         plot(data(i-5:i,15),data(i-5:i,16),'r')
+%         hold on
+%     end
+%     
+%     %pause(0.001)
+% end
+% end
 %% Plot
 
 figure
-% subplot(311)
-% plot(F1(:,1),'g')
-% hold on
-% plot(F2(:,1),'r')
-% title('X forces')
-% 
-% subplot(312)
-% plot(F1(:,2))
-% hold on
-% plot(F2(:,2),'r')
-% title('Y forces')
+subplot(311)
+plot(F1(:,1),'g')
+hold on
+plot(F2(:,1),'r')
+title('X forces')
+
+subplot(312)
+plot(F1(:,2))
+hold on
+plot(F2(:,2),'r')
+title('Y forces')
 
 subplot(313)
 plot(F1(:,3))
@@ -125,7 +112,7 @@ title('Z forces')
 
 
 %% Marker data
-vicon_stick
+% vicon_stick
 
 %%
 figure

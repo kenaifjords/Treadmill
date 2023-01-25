@@ -1,0 +1,19 @@
+function [tlaR, tlaL] = getTrailingLimbAngle(Rankle,Lankle,Rpsis,Lpsis)
+oppR = Rpsis(:,1) - Rankle(:,1);
+adjR = Rpsis(:,3) - Rankle(:,3);
+oppL = Lpsis(:,1) - Lankle(:,1);
+adjL = Lpsis(:,3) - Lankle(:,3);
+size(oppR)
+
+% angR = atan(oppR./adjR);
+% angL = atan(oppL./adjL);
+angR = atan2(oppR,adjR);
+angL = atan2(oppL,adjL);
+
+for i = 2:size(angR,1)
+    if (angR(i) - angR(i-1)) >= pi
+        angR(i) = angR
+        
+tlaR = angR;
+tlaL = angL;
+end
