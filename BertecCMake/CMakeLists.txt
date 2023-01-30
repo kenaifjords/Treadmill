@@ -14,29 +14,37 @@ else()
     )
 endif()
 
+if(WIN32)
+    # Prefix all shared libraries with 'lib'.
+    set(CMAKE_SHARED_LIBRARY_PREFIX "")
+    # Prefix all static libraries with 'lib'.
+    set(CMAKE_STATIC_LIBRARY_PREFIX "")
+endif()
+
 # Allow selecting static or dynamic
 # https://cmake.org/cmake/help/latest/guide/tutorial/Selecting%20Static%20or%20Shared%20Libraries.html#step-9-selecting-static-or-shared-libraries
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
-# set(CMAKE_CXX_STANDARD 11)
-add_executable(DemoLinkageExe main.cpp)
+
 
 # Load the library into CMake
 # We may be able to call "regsvr32 BertecDevice.lib", but that fails on all of them so far
 # TODO determine when to use the x64 directory
-if(${BUILD_SHARED_LIBS})
-    add_library(BertecDevice STATIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME}/x64/BertecDevice.dll)
-else()
-    add_library(BertecDevice  SHARED ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME}/x64/BertecDevice.lib)
-endif()
+add_library(BertecDevice ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME}/x64/BertecDevice.lib)
 
 # Create an alias (modern cmake style) so we can be sure it is found for linking
 add_library(Bertec::BertecDevice ALIAS BertecDevice)
 # Because CMake cannot determine the linker language on it's own, set it to C++ here
-set_target_properties(BertecDevice PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(BertecDevice PROPERTIES LINKER_LANGUAGE C)
 
 # Now we include directories, again, using brittle absolute paths
 target_include_directories(BertecDevice PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME})
 
+# Try building the bertec example
+add_executable(BertecExample ${CMAKE_CURRENT_BINARY_DIR}/_deps/${BERTEC_FOLDER_NAME}/BertecExample.cpp)
+target_link_libraries(BertecExample PUBLIC Bertec::BertecDevice)
+set_target_properties(BertecExample PROPERTIES LINKER_LANGUAGE C)
+
 # Finally, link the Bertec Library to the add_executable
-target_link_libraries(DemoLinkageExe PUBLIC Bertec::BertecDevice)
+# add_executable(DemoLinkageExe main.cpp)
+# target_link_libraries(DemoLinkageExe PUBLIC Bertec::BertecDevice)

@@ -14,8 +14,10 @@ Rachel Marbaker
 In a MSYS2 terminal, navigate to this directory, then run the following.
 ```
 cd /f/Users/Rachel/ClosedLoopControl
-# Create the makefile
+# Generate
 cmake -G "MSYS Makefiles" -S . -B build
+# OR 
+cmake -G "MinGW Makefiles" -S . -B build
 # Run the build tool (you could call make directly)
 cmake --build build
 # Run
