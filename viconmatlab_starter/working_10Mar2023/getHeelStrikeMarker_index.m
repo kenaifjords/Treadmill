@@ -1,4 +1,4 @@
-function [hsR,hsL,toR,toL] = getHeelStrikeMarker(pRtoe,pLtoe,pRheel,pLheel,trajtime)
+function [ihsRheel,ihsLheel,itoRheel,itoLheel] = getHeelStrikeMarker_index(pRtoe,pLtoe,pRheel,pLheel,trajtime)
 % using the y position of the heel markers, we define heel strike as the
 % maximum position and toe off as the minimum position
 
@@ -8,7 +8,7 @@ function [hsR,hsL,toR,toL] = getHeelStrikeMarker(pRtoe,pLtoe,pRheel,pLheel,trajt
 % hsR = trajtime(ihsRtoe);
 % hsL = trajtime(ihsLtoe);
 
-% changed column index from 2 to 1 on 31Jan2023 and back on 1Feb2023
+% changed column index from 2 to 1 on 31Jan2023 and back to 1Feb2023
 
 % find heel strike with heel
 [yRheelmag,ihsRheel] = findpeaks(pRheel(:,2),'MinPeakDistance',90);

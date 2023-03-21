@@ -1,0 +1,26 @@
+% TM2_02_identifyHeelStrikes
+global homepath subject F p
+tic
+for subj = 1:subject.n
+    for effcond = 1:length(subject.effortcondition)
+        for blk = 1:length(subject.blockname)
+        [F{subj}.hsR{effcond,blk},F{subj}.hsL{effcond,blk},F{subj}.toR{effcond,blk},F{subj}.toL{effcond,blk}] =...
+            getHeelStrikeForce(F{subj}.R{effcond,blk},F{subj}.L{effcond,blk},F{subj}.time{effcond,blk});
+        % get indices
+         [F{subj}.hsR_idx{effcond,blk},F{subj}.hsL_idx{effcond,blk},F{subj}.toR_idx{effcond,blk},F{subj}.toL_idx{effcond,blk}] =...
+            getHeelStrikeForce_index(F{subj}.R{effcond,blk},F{subj}.L{effcond,blk},F{subj}.time{effcond,blk});
+        
+        [p{subj}.hsR{effcond,blk},p{subj}.hsL{effcond,blk},p{subj}.toR{effcond,blk},p{subj}.toL{effcond,blk}] =...
+            getHeelStrikeMarker(p{subj}.Rtoe{effcond,blk},p{subj}.Ltoe{effcond,blk},...
+            p{subj}.Rheel{effcond,blk},p{subj}.Lheel{effcond,blk},p{subj}.trajtime{effcond,blk});
+        % get indices
+        [p{subj}.hsR_idx{effcond,blk},p{subj}.hsL_idx{effcond,blk},p{subj}.toR_idx{effcond,blk},p{subj}.toL_idx{effcond,blk}] =...
+            getHeelStrikeMarker_index(p{subj}.Rtoe{effcond,blk},p{subj}.Ltoe{effcond,blk},...
+            p{subj}.Rheel{effcond,blk},p{subj}.Lheel{effcond,blk},p{subj}.trajtime{effcond,blk});
+    %     [p{subj}.hsR{effcond,blk},p{subj}.hsL{effcond,blk},p{subj}.toR{effcond,blk},p{subj}.toL{effcond,blk}] =...
+    %         getHeelStrikeAnkleMarker(p{subj}.Rankle{effcond,blk},p{subj}.Lankle{effcond,blk},...
+    %         p{subj}.trajtime{effcond,blk});
+        end
+    end
+end
+toc
