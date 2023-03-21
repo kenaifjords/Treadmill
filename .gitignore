@@ -2,3 +2,7 @@ viconmatlab_starter/csvData/
 viconmatlab_starter/matData/
 viconmatlab_starter/csvData_v2/
 viconmatlab_starter/matData_v2/
+*.csv
+!*.m
+*.zip
+*.7z
