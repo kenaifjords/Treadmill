@@ -22,6 +22,7 @@ if trimyes == 1
 else
     dataraw=devicedata;
 end
+% flip signs of forces and moments
 dataraw(:,[3:5 6:8 18:20 21:23])=-dataraw(:,[3:5 6:8 18:20 21:23]);
 
 % F1 = [dataraw(:,3) dataraw(:,4) dataraw(:,5)];  %N, 
@@ -39,6 +40,7 @@ dataraw(:,[3:5 6:8 18:20 21:23])=-dataraw(:,[3:5 6:8 18:20 21:23]);
 
 % Filter
 % Select only (16 col) : F1xF1yF1zM1xM1yM1zCOP1xCOP1yF2xF2yF2zM2xM2yM2zCOP2xCOP2y
+pin1 = dataraw(:,[12:17]); pin2 = dataraw(:,[27:32]);
 dataraw = dataraw(:,[3:10 18:25]);
 fs = devicefs;
 fc=20;
@@ -66,7 +68,18 @@ COP2 = [data(:,15) data(:,16) ]; %mm
 F1old=F1;
 F2old=F2;
 timeold=time;
-
+M1old = M1;
+M2old = M2;
+COP1old = COP1;
+COP2old = COP2;
+% resample force and force time
+time=resample(timeold,1,10);
+F1=resample(F1old,1,10);
+F2=resample(F2old,1,10);
+M1 = resample(M1old,1,10);
+M2 = resample(M2old,1,10);
+COP1 = resample(COP1old,1,10);
+COP2 = resample(COP2old,1,10);
 
 %% Animation
 tport=100;
@@ -196,10 +209,102 @@ title('vertical ankle position in time')
 xlabel('time')
 ylabel('vertical position')
 
+
+%% COP DATA COMPARED TO ANKLE MARKER
+figure('Name',sprintf('COP IN TIME: %s  ',filename)) %2
+subplot(211)
+plot(time,COP2(:,1),'r--')
+hold on
+plot(time,COP1(:,1),'g--')
+title('COP in time - across TM')
+xlabel('time')
+ylabel('lateral COP')
+
+subplot(212)
+plot(time,COP2(:,2),'r')
+hold on
+plot(time,COP1(:,2),'g')
+title('COP in time - along TM')
+xlabel('time')
+ylabel('sagittal COP')
+
+%% MOMENT DATA COMPARED TO ANKLE MARKER
+figure('Name',sprintf('MOMENT IN TIME: %s  ',filename)) %2
+subplot(211)
+plot(time,M2(:,1),'r--')
+hold on
+plot(time,M1(:,1),'g--')
+title('Moment in time - rotation about axis across TM')
+xlabel('time')
+ylabel('lateral moment')
+
+subplot(212)
+plot(time,M2(:,2),'r')
+hold on
+plot(time,M1(:,2),'g')
+title('y moment in time  -rotation about axis along TM')
+xlabel('time')
+ylabel('sagittal moment')
+
+
+
+%% MOMENT DATA COMPARED FORCEs
+figure('Name',sprintf('MOMENT IN TIME: %s  ',filename)) %2
+plot(time,F2(:,2),'r--')
+hold on
+plot(time,F1(:,2),'g--')
+title('X Moment (scaled) and Y Force (dashed)')
+
+ylabel('lateral moment')
+plot(time,M2(:,1)/(10^3),'r')
+hold on
+plot(time,M1(:,1)/(10^3),'g')
+xlabel('time')
+
+ylabel('force or moment / 1000')
+%%
+mpin2 = resample(pin2(:,4),1,10);
+mpin1 = resample(pin1(:,4),1,10);
+%% MOMENT DATA COMPARED TO PINS (determine if pin data is centered on the forceplate)
+figure('Name',sprintf('MOMENT and PIN OUTPUT IN TIME: %s  ',filename)) %2
+
+plot(time,-mpin2,'r:','LineWidth', 2)
+hold on
+plot(time,-mpin1,'g:','LineWidth', 2)
+title('x Moment (scaled) andx moment pin out (dashed)')
+
+ylabel('lateral moment')
+plot(time,M2(:,1)/(10^5),'r')
+hold on
+plot(time,M1(:,1)/(10^5),'g')
+xlabel('time')
+
+ylabel('pin signal or moment / 10^5')
+
+%%
+fxpin2 = resample(pin2(:,3),1,10);
+fxpin1 = resample(pin1(:,3),1,10);
+%% FORCE DATA COMPARED TO PINS (determine if pin data is centered on the forceplate)
+figure('Name',sprintf('MOMENT and PIN OUTPUT IN TIME: %s  ',filename)) %2
+
+plot(time,fxpin2,'r:','LineWidth', 2)
+hold on
+plot(time,fxpin1,'g:','LineWidth', 2)
+title('X Moment (scaled) and x moment pin out (dashed)')
+
+ylabel('lateral moment')
+plot(time,F2(:,3)/(10^3),'r')
+hold on
+plot(time,F1(:,3)/(10^3),'g')
+xlabel('time')
+
+ylabel('pin signal or vertical force / 10^3')
+
+
 %% Identify heelstrike
-time=resample(timeold,1,10);
-F1=resample(F1old,1,10);
-F2=resample(F2old,1,10);
+% time=resample(timeold,1,10);
+% F1=resample(F1old,1,10);
+% F2=resample(F2old,1,10);
 
 F1((F1(:,3)<50),3)=0;
 F2((F2(:,3)<50),3)=0;
@@ -334,14 +439,13 @@ plot(pRankle(ind_hsfp1,2),pRankle(ind_hsfp1,3),'o')
 % plot(pRankle(ind_tofp1,2),pRankle(ind_tofp1,3),'k*')
 plot(pLankle(ind_hsfp1,2),pLankle(ind_hsfp1,3),'*')
 xlim([150 1250])
-%figure
-%subplot(211)
-%plot(steptime1)
-%title('Step Times')
-%hold on
-%plot(steptime2,'g')
-%ylabel('Time (s)')
-%legend('Right','Left')
+
+figure; hold on; title('COP')
+plot(COP1(:,1), COP1(:,2),'g')
+plot(COP2(:,1), COP2(:,2),'r')
+ylabel('saggital postiion')
+xlabel('lateral position')
+legend('Right','Left')
  
 %subplot(212)
 %plot(steptime_asym)

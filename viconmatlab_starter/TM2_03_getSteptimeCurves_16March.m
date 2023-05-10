@@ -33,9 +33,9 @@ for subj = 1:subject.n
                 rfirst = hsl(1) > hsr(1);
 
                 % was the first step on the fastleg
-                if subject.fastleg(subj,effcond) == 1 && rfirst
+                if subject.fastleg(subj) == 1 && rfirst
                     fastlegfirst = 1;
-                elseif subject.fastleg(subj,effcond) == 2 && lfirst
+                elseif subject.fastleg(subj) == 2 && lfirst
                     fastlegfirst = 1;
                 else
                     fastlegfirst = 0;
@@ -82,7 +82,7 @@ for subj = 1:subject.n
                 steptime2 = steptime2all(1:maxsteps);
 
                 % determine asymetry (fast - slow) 
-                if subject.fastleg(subj,effcond) == 1
+                if subject.fastleg(subj) == 1
                     steptime_asym = (steptime1 - steptime2)./(steptime1 + steptime2);
                 else
                     steptime_asym = (steptime2 - steptime1)./(steptime1 + steptime2);
@@ -96,6 +96,6 @@ for subj = 1:subject.n
     end
 end
 if yesplot
-    % lot function
+    % plot function
 end
 toc

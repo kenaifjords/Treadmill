@@ -1,18 +1,19 @@
 %TM2figure_plotLearningCurves
+% plots step length learning curves against time
 function TM2figure_plotLearningCurves
 global homepath subject F p colors asym
 tic
 for subj = 1:subject.n
     for effcond = 1:length(subject.effortcondition)
         for blk = 1:subject.nblk
+            disp(['Processing for: ' subject.list(subj) subject.effortlabel(effcond) subject.blockname(blk)]) 
             %% the step asymmetries
             steplength1 = asym(subj).steplength_r{effcond,blk}; % = steplength1;
             steplength2 = asym(subj).steplength_l{effcond,blk}; % = steplength2;
             maxsteps = asym(subj).nsteps{effcond,blk}; % = maxsteps;
             steplength_asym = asym(subj).asymlength{effcond,blk};% = steplength_asym;
-            steptime1 = asym(subj).steptime_r{effcond,blk}; % = steptime1;
-            steptime2 = asym(subj).steptime_l{effcond,blk}; % = steptime2;
-            steptime_asym = asym(subj).steptime_asym{effcond,blk};
+            hsLasym = asym(subj).hsL{effcond,blk};
+            hsRasym = asym(subj).hsR{effcond,blk};
             
             %% make a plot for step length
             if effcond == 1
@@ -50,10 +51,10 @@ for subj = 1:subject.n
             figure(subj);
             sgtitle(subject.list(subj))
             subplot(4,subject.nblk,plotblk); hold on;
-            plot(F{subj}.hsL{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength1,'r.')
+            plot(hsLasym,steplength1,'r.')
 %             title('Step Lengths')
             hold on
-            plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength2,'g.')
+            plot(hsLasym,steplength2,'g.')
             ylabel('Step length (mm)')
             if plotblk == 7 || plotblk == 21
                 legend('Right','Left')
@@ -67,7 +68,7 @@ for subj = 1:subject.n
                 plotblk = 3*subject.nblk + blk;
             end
             subplot(4,subject.nblk,plotblk)
-            plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym)
+            plot(hsLasym,steplength_asym,'Color',colorasym)
 %             title(subject.effortlabel(effcond))
             ylabel('Asymmetry (fast - slow) Length (mm)')
             xlabel('Time (s)')
@@ -92,17 +93,17 @@ for subj = 1:subject.n
                 end
                 subplot(2,2,splitplotloc); hold on
                 sgtitle(subject.list(subj))
-                plot(F{subj}.hsL{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength1,'r.')
+                plot(hsLasym,steplength1,'r.')
                 title('Step Lengths')
                 hold on
-                plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength2,'g.')
+                plot(hsLasym,steplength2,'g.')
                 ylabel('Length (mm)')
                 legend('Right','Left')
                 xlabel('Time (s)')
                 ylim([300,800]);
                 
                 subplot(2,2,splitplotloc + 2); hold on;
-                plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym)
+                plot(hsLasym,steplength_asym,'Color',colorasym)
                 title(subject.effortlabel(effcond))
                 ylabel('Asymmetry (fast - slow) Length (mm)')
                 xlabel('Time (s)')
@@ -115,27 +116,27 @@ for subj = 1:subject.n
             if blk == 4 || blk == 6 % split 1 %split 2 = saving
                 if blk == 4
                     subplot(221); hold on;
-                    plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                    plot(hsLasym,steplength_asym,'Color',colorasym,'LineWidth',1.5)
                     ylabel('Asymmetry (fast - slow) Length (mm)')
                     ylim([-0.5 0.5])
                     xlim([0 615])
                     title('compare learning')
                     if effcond == 1
                         subplot(223); hold on;
-                        plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                        plot(hsLasym,steplength_asym,'Color',colorasym,'LineWidth',1.5)
                     else
                         subplot(224); hold on;
-                        plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                        plot(hsLasym,steplength_asym,'Color',colorasym,'LineWidth',1.5)
                     end
                 else
                     subplot(222); hold on;
-                    plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                    plot(hsLasym,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
                     ylim([-0.5 0.5])
                     xlim([0 615])
                     title('compare savings')
                     if effcond == 1
                         subplot(223); hold on;
-                        plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                        plot(hsLasym,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
                         ylabel('Asymmetry (fast - slow) Length (mm)')
                         xlabel('Time (s)')
                         ylim([-0.5 0.5])
@@ -143,7 +144,7 @@ for subj = 1:subject.n
                         title('high effort learning and savings')
                     else
                         subplot(224); hold on;
-                        plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                        plot(hsLasym,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
                         xlabel('Time (s)')
                         ylim([-0.5 0.5])
                         xlim([0 615])
@@ -155,27 +156,27 @@ for subj = 1:subject.n
                 sgtitle(subject.list(subj))
                 if blk == 4
                     subplot(221); hold on;
-                    plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                    plot(hsLasym,steplength_asym,'Color',colorasym,'LineWidth',1.5)
                     ylabel('Asymmetry (fast - slow) Length (mm)')
                     ylim([-0.5 0.5])
                     xlim([0 120])
                     title('compare learning')
                     if effcond == 1
                         subplot(223); hold on;
-                        plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                        plot(hsLasym,steplength_asym,'Color',colorasym,'LineWidth',1.5)
                     else
                         subplot(224); hold on;
-                        plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                        plot(hsLasym,steplength_asym,'Color',colorasym,'LineWidth',1.5)
                     end
                 else
                     subplot(222); hold on;
-                    plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                    plot(hsLasym,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
                     ylim([-0.5 0.5])
                     xlim([0 120])
                     title('compare savings')
                     if effcond == 1
                         subplot(223); hold on;
-                        plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                        plot(hsLasym,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
                         ylabel('Asymmetry (fast - slow) Length (mm)')
                         xlabel('Time (s)')
                         ylim([-0.5 0.5])
@@ -183,7 +184,7 @@ for subj = 1:subject.n
                         title('high effort learning and savings')
                     else
                         subplot(224); hold on;
-                        plot(F{subj}.hsR{effcond,blk}(asym(subj).firstvalidstep{effcond,blk}:maxsteps),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                        plot(hsLasym,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
                         xlabel('Time (s)')
                         ylim([-0.5 0.5])
                         xlim([0 120])

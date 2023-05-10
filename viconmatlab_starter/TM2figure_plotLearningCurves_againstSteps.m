@@ -2,7 +2,7 @@
 function TM2figure_plotLearningCurves
 global homepath subject F p colors asym
 tic
-for subj = 1:subject.n
+for subj = 10 %1:subject.n
     for effcond = 1:length(subject.effortcondition)
         for blk = 1:subject.nblk
             subj
@@ -58,10 +58,10 @@ for subj = 1:subject.n
             figure(subj);
             sgtitle(subject.list(subj))
             subplot(4,subject.nblk,plotblk); hold on;
-            plot(1:maxsteps,steplength1,'r.')
+            plot(1:length(steplength1),steplength1,'r.') % ### x should be 1:maxsteps
 %             title('Step Lengths')
             hold on
-            plot(1:maxsteps,steplength2,'g.')
+            plot(1:length(steplength2),steplength2,'g.') % ### x should be 1:maxsteps
             ylabel('Step length (mm)')
             if plotblk == 7 || plotblk == 21
                 legend('Right','Left')
@@ -75,11 +75,11 @@ for subj = 1:subject.n
                 plotblk = 3*subject.nblk + blk;
             end
             subplot(4,subject.nblk,plotblk)
-            plot(1:maxsteps,steplength_asym,'Color',colorasym)
+            plot(1:length(steplength_asym),steplength_asym,'Color',colorasym) % ### x should be 1:maxsteps
 %             title(subject.effortlabel(effcond))
             ylabel('Asymmetry (fast - slow) Length (mm)')
             xlabel('step number')
-            text(50,0.5,['fastleg: ' subject.leglabel(subject.fastleg(subj,effcond))]);
+            text(50,0.5,['fastleg: ' subject.leglabel(subject.fastleg(subj))]);
             ylim([-0.5 0.5])
 
 %             %% save the step asymmetries
@@ -100,21 +100,21 @@ for subj = 1:subject.n
                 end
                 subplot(2,2,splitplotloc); hold on
                 sgtitle(subject.list(subj))
-                plot((1:maxsteps),steplength1,'r.')
+                plot(1:length(steplength1),steplength1,'r.') %### x should be 1:maxsteps
                 title('Step Lengths')
                 hold on
-                plot(1:maxsteps,steplength2,'g.')
+                plot(1:length(steplength2),steplength2,'g.') %### x should be 1:maxsteps
                 ylabel('Length (mm)')
                 legend('Right','Left')
                 xlabel('step number')
                 ylim([300,800]);
                 
                 subplot(2,2,splitplotloc + 2); hold on;
-                plot(1:maxsteps,steplength_asym,'Color',colorasym)
+                plot(1:length(steplength_asym),steplength_asym,'Color',colorasym) %### x should be 1:maxsteps
                 title(subject.effortlabel(effcond))
                 ylabel('Asymmetry (fast - slow) Length (mm)')
                 xlabel('step number')
-                text(50,0.5,['fastleg: ' subject.leglabel(subject.fastleg(subj,effcond))]);
+                text(50,0.5,['fastleg: ' subject.leglabel(subject.fastleg(subj))]);
                 ylim([-0.5 0.5])
             end
             % PLOT THAT COMPARES LEARN and SAVE and HIGH LEARN TO LOW LEARN
@@ -123,27 +123,27 @@ for subj = 1:subject.n
             if blk == 4 || blk == 6 % split 1 %split 2 = saving
                 if blk == 4
                     subplot(221); hold on;
-                    plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                    plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineWidth',1.5) %### x should be 1:maxsteps
                     ylabel('Asymmetry (fast - slow) Length (mm)')
                     ylim([-0.4 0.4])
                     xlim([0 615])
                     title('compare learning')
                     if effcond == 1
                         subplot(223); hold on;
-                        plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                        plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineWidth',1.5) %### x should be 1:maxsteps
                     else
                         subplot(224); hold on;
-                        plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                        plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineWidth',1.5) %### x should be 1:maxsteps
                     end
                 else
                     subplot(222); hold on;
-                    plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                    plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2) %### x should be 1:maxsteps
                     ylim([-0.4 0.4])
                     xlim([0 615])
                     title('compare savings')
                     if effcond == 1
                         subplot(223); hold on;
-                        plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                        plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2) %### x should be 1:maxsteps
                         ylabel('Asymmetry (fast - slow) Length (mm)')
                         xlabel('step number')
                         ylim([-0.4 0.4])
@@ -163,27 +163,27 @@ for subj = 1:subject.n
                 sgtitle(subject.list(subj))
                 if blk == 4
                     subplot(221); hold on;
-                    plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                    plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineWidth',1.5) %### x should be 1:maxsteps
                     ylabel('Asymmetry (fast - slow) Length (mm)')
                     ylim([-0.4 0.4])
                     xlim([0 200])
                     title('compare learning')
                     if effcond == 1
                         subplot(223); hold on;
-                        plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                        plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineWidth',1.5)%### x should be 1:maxsteps
                     else
                         subplot(224); hold on;
-                        plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineWidth',1.5)
+                        plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineWidth',1.5)%### x should be 1:maxsteps
                     end
                 else
                     subplot(222); hold on;
-                    plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                    plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)%### x should be 1:maxsteps
                     ylim([-0.4 0.4])
                     xlim([0 200])
                     title('compare savings')
                     if effcond == 1
                         subplot(223); hold on;
-                        plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                        plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)%### x should be 1:maxsteps
                         ylabel('Asymmetry (fast - slow) Length (mm)')
                         xlabel('step number')
                         ylim([-0.4 0.4])
@@ -191,12 +191,14 @@ for subj = 1:subject.n
                         title('high effort learning and savings')
                     else
                         subplot(224); hold on;
-                        plot(1:maxsteps,steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)
+                        plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)%### x should be 1:maxsteps
                         xlabel('step number')
                         ylim([-0.4 0.4])
                         xlim([0 200])
                         title('low effort learning and savings')
                     end
+                    figure(105 * subj); hold on
+                    plot(1:length(steplength_asym),steplength_asym,'Color',colorasym,'LineStyle',':','LineWidth',2)%### x should be 1:maxsteps
                 end
             end
             beautifyfig

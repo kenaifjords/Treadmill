@@ -8,6 +8,9 @@ if isfile(csvpath)
     fid = fopen(csvpath);
 else
     fprintf('File not found: %s. \n',filename);
+    devicedata = [];
+    trajdata = [];
+    cd(homepath)
     return
 end
 

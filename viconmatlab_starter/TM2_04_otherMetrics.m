@@ -6,12 +6,15 @@ global homepath subject F p colors asym
 for subj = 1:subject.n
     for effcond = 1:length(subject.effortcondition)
         for blk = 1:subject.nblk
-            % Calculate steplength, steptime, and steplength asymmetry
+            %% step width
              i=1;
              clear stepwidth1 stepwidth2 stepwidth1all stepwidth2all
              i_hsL = F{subj}.hsL_idx{effcond, blk};%(2:end);
              i_hsR = F{subj}.hsR_idx{effcond, blk};%(2:end);
-
+             FR = F{subj}.R{effcond,blk}; FL = F{subj}.L{effcond,blk};
+             Ftime = F{subj}.time{effcond,blk};
+             hsR = F{subj}.hsR{effcond,blk};
+             hsL = F{subj}.hsL{effcond,blk};
             % index changed from 2 to 1 to get the x position of the ankle
             % markers
              stepwidth2all = p{subj}.Lankle{effcond, blk}(i_hsL,1) - ...
@@ -32,21 +35,21 @@ for subj = 1:subject.n
                     end
                 end
                 if F{subj}.hsR{effcond, blk}(fir) < F{subj}.hsL{effcond, blk}(fir) % fp1 strikes first (right)
-                    if subject.fastleg(subj,effcond) == 1
+                    if subject.fastleg(subj) == 1
                         fastleg1st = 1;
                     end
                 elseif F{subj}.hsR{effcond, blk}(fir) > F{subj}.hsL{effcond, blk}(fir) % fp2 strikes first so take its second heel strike
-                    if subject.fastleg(subj,effcond) == 2
+                    if subject.fastleg(subj) == 2
                         fastleg1st = 1;
                     end
                 end
                 %step time on belt 1 (right)
                 if F{subj}.hsL{effcond, blk}(fir) < F{subj}.hsR{effcond, blk}(fir)   %fp2 strikes first
-                    if subject.fastleg(subj,effcond) == 2
+                    if subject.fastleg(subj) == 2
                         fastleg1st = 1;
                     end
                 elseif F{subj}.hsL{effcond, blk}(fir)>F{subj}.hsR{effcond, blk}(fir) %fp1 strikes first so take its second heel strike
-                    if subject.fastleg(subj,effcond) == 1
+                    if subject.fastleg(subj) == 1
                         fastleg1st = 1;
                     end
                 end
@@ -66,7 +69,7 @@ for subj = 1:subject.n
             if fastleg1st == 1
                 % no trimming required
             else
-                if subject.fastleg(subj,effcond) == 1
+                if subject.fastleg(subj) == 1
                     % trim slow leg for the first?
                     stepwidth2 = stepwidth2(2:end);
                     stepwidth1 = stepwidth1(1:end-1);
@@ -77,7 +80,7 @@ for subj = 1:subject.n
                 end
             end
             maxsteps = length(stepwidth1);
-            if subject.fastleg(subj,effcond) == 1 % right
+            if subject.fastleg(subj) == 1 % right
                 steplength_asym=(stepwidth1-stepwidth2)./(stepwidth1+stepwidth2);
             else
                 steplength_asym=(stepwidth2-stepwidth1)./(stepwidth1+stepwidth2);
@@ -85,6 +88,16 @@ for subj = 1:subject.n
             asym(subj).stepwidth_r{effcond,blk} = stepwidth1;
             asym(subj).stepwidth_l{effcond,blk} = stepwidth2;
             asym(subj).stepwidth_asym{effcond,blk} = steplength_asym;
+            %% force time integral
+            [FtR,FtL] = getFzTimeIntegral(FR,FL,Ftime,hsR,hsL);
+            mxint = min(length(FtR),length(FtL));
+            FtR = FtR(1:mxint); FtL = FtL(1:mxint);
+            if subject.fastleg(subj) == 1 % right
+                Ft_int_asym=(FtR-FtL)./(FtR+FtL);
+            else
+                Ft_int_asym=(FtL-FtR)./(FtR+FtL);
+            end
+            asym(subj).forceintegral_asym{effcond,blk} = Ft_int_asym;
         end
     end
 end
