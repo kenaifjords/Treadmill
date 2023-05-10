@@ -51,16 +51,16 @@ for subj = 1:subject.n
     b = load(file_marker);
     file_ik = [subject.list{subj} '_ik.mat'];
     file_id = [subject.list{subj} '_id.mat'];
-    F{subj} = a.f;
-    p{subj} = b.pp;
+    F(subj) = a.f;
+    p(subj) = b.pp;
     cd('C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter\matData_IKID')
     if isfile(file_ik)
         c = load(file_ik);
-        IK{subj} = c.ik;
+        IK(subj) = c.ik;
     end
     if isfile(file_id)
         d = load(file_id);
-        ID{subj} = d.id;
+        ID(subj) = d.id;
     end
 end
 cd(homepath)
