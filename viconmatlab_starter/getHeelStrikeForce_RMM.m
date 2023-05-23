@@ -4,8 +4,8 @@ eventnum = 20;
 f1 = F1(:,3);
 f2 = F2(:,3);
 % get binary foot on or off based on 50N threshold
-fb1 = f1>150;
-fb2 = f2>150;
+fb1 = f1>200;
+fb2 = f2>200;
 % identify changes from foot off to foot on with a requirement for several
 % samples following the first change (removes spurious true/false related
 % to slight changes in force at or near the threshold)

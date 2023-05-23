@@ -14,7 +14,7 @@ itrim = 50; %50; % trim the first 40/100ths of a second
 trim_time = 1;
 % take the mat files for each subject and build a full structure, so that
 % we can loop through subjects - PREFER ONE SUBJECT AT A TIME
-subject.list =  {'MAC' 'FUM' 'QPQ' 'CFL' 'COM' 'KJC' 'LKT' 'HZO' 'MLU' 'BEO'};% 'MAC' 'BAN' 'MLL' 'BAB' 'FUM' 'QPQ' 'CFL' 'COM' 'KJC' 'LKT' 'HZO' 'MLU' 'BEO'}; % RMM BTT 
+subject.list =  {'CFL'};
 % 'MAC' 'BAN' 'MLL' 'BAB' 'FUM' 'QPQ' 'CFL' 'COM' 'KJC' 'LKT' 'HZO' 'MLU' 'BEO'
 subject.blockname = {'base1' 'base2' 'base3' 'split1' 'wash1' 'split2' 'wash2'};
 subject.effortcondition = {'high','low'};
@@ -101,6 +101,31 @@ for subj = 1:length(subject.list)
                 M2 = [data(:,12) data(:,13) data(:,14)];  %Nmm
                 COP2 = [data(:,15) data(:,16) ]; %mm
             end
+            
+                            % data correction for BEO
+                            if strcmp(subject.list(subj),'BEO')
+                                if effcond == 2
+                                    if blk == 3
+                                        F1(:,3) = F1(:,3) + 300;
+                                        F2(:,3) = F2(:,3) + 250;
+                                    elseif blk == 4
+                                        F1(:,3) = F1(:,3) + 240;
+                                        F2(:,3) = F2(:,3) + 270;
+                                    end
+                                end
+                            end
+                            
+                            % data correction for CFL
+                            if strcmp(subject.list(subj),'FUM')
+                                if effcond == 1
+                                    if blk == 1
+                                        F1(:,3) = F1(:,3) + 385;
+                                        F2(:,3) = F2(:,3) + 380;
+                                    end
+                                end
+                            end
+            
+            
             % save forces since they will be resampled to identify heel strikes
             F1old=F1;
             F2old=F2;

@@ -1,4 +1,8 @@
 function plot_with_stderr(x,mat,color)
+% mat is a matrix of profiles that will be averaged and standard errored
+% across rows
+% x corresponds to the direction of mat columns
+% color is a 3 or 4 number RGB / 255 (division is stablished in input)
 if x == 0
     x = 1:size(mat,2);
 end

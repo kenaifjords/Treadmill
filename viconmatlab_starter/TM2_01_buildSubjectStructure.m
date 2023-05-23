@@ -39,8 +39,10 @@ colors.high = [248,118,102]/255; % coral-ly orange
 colors.low = [75,143,140]/255; %teal-y
 colors.high_light = cat(2,[248,118,102]/255,0.3); % coral-ly orange
 colors.low_light = cat(2,[75,143,140]/255,0.4); %teal-y
-colors.all{1,1} = colors.high; colors.all{1,2} = colors.high_light;
-colors.all{2,1} = colors.low; colors.all{2,2} = colors.low_light;
+colors.high2 = [213 94 50]/255; %[255,76,52]/255; % burnt orange
+colors.low2 = [78,130,109]/255; % [0 158 95]/255; %[49, 156, 189]/255;  % emerald
+colors.all{1,1} = colors.high; colors.all{1,2} = colors.high_light; colors.all{1,3} = colors.high2;
+colors.all{2,1} = colors.low; colors.all{2,2} = colors.low_light; colors.all{2,3} = colors.low2;
 %% create force and marker position data
 for subj = 1:subject.n
     file_force = [subject.list{subj} '_F.mat'];
