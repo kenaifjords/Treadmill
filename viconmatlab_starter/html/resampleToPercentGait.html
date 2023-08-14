@@ -1,0 +1,245 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>resampleToPercentGait</title><meta name="generator" content="MATLAB 9.10"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2023-05-31"><meta name="DC.source" content="resampleToPercentGait.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [gaitResampledR,gaitResampledL] = resampleToPercentGait(continuousDataR,<span class="keyword">...</span>
+continuousDataL,continuosDataTime, hsR, hsL)
+<span class="keyword">global</span> F
+nSamp = 100;
+<span class="comment">% resampleToPercentGaitCycle</span>
+<span class="comment">% 1) we input data that reflects the time profile of the data (position,</span>
+<span class="comment">% forces, dynamics, kinematics etc.)</span>
+<span class="comment">% 2) using heel strikes we trim the continuos profile into a cell structure</span>
+<span class="comment">% that includes the time profile of each stride (one stride per row)</span>
+<span class="comment">% 3) identify the force time integral, peak heel strike and toe off forces</span>
+
+<span class="comment">% break down into each stride hsR and hsL are in time, we want to find the</span>
+<span class="comment">% time in continuosDataTime that is closest to the hs time, then we want to</span>
+<span class="comment">% save these indices</span>
+<span class="keyword">for</span> i = 1:length(hsR)
+    ix = find(continuosDataTime &lt; hsR(i),1,<span class="string">'last'</span>);
+    <span class="keyword">if</span> isempty(ix)
+        continuosDataHsIdx(i) = NaN;
+    <span class="keyword">else</span>
+        continuosDataHsIdx(i) = ix;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+cdhsi = continuosDataHsIdx;
+<span class="keyword">for</span> strd = 1:length(cdhsi)-1
+    <span class="keyword">if</span> ~isnan(cdhsi(strd)) &amp;&amp; ~isnan(cdhsi(strd+1))
+        sdR = continuousDataR(cdhsi(strd):cdhsi(strd+1));
+        sdTime = continuosDataTime(cdhsi(strd):cdhsi(strd+1));
+    <span class="keyword">else</span>
+        sdR = [];
+        sdTime = [];
+    <span class="keyword">end</span> <span class="comment">% nan strides will be empty</span>
+    strideDataR{strd,1} = sdR; <span class="comment">%(~cellfun('isempty',sdR)); %remove empty cells</span>
+    strideDataTime{strd,1} = sdTime; <span class="comment">%(~cellfun('isempty',sdR)); %remove empty cells</span>
+<span class="keyword">end</span>
+<span class="comment">% resample each cell and writing to matrix</span>
+resampleR = NaN(size(strideDataR,1),100);
+<span class="keyword">for</span> ci = 1:size(strideDataR,1)
+    a = strideDataR{ci,1};
+    x = strideDataTime{ci,1};
+    <span class="keyword">if</span> ~isempty(x) &amp;&amp; length(x) &gt; 1
+        xres = linspace(x(1),x(end), nSamp);
+        y = interp1(x,a,xres);
+        resampleR(ci,:) = y;
+    <span class="keyword">else</span>
+        resampleR(ci,:) = NaN(1,nSamp);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">% LEFT</span>
+<span class="keyword">for</span> i = 1:length(hsL)
+    ix = find(continuosDataTime &lt; hsL(i),1,<span class="string">'last'</span>);
+    <span class="keyword">if</span> isempty(ix)
+        continuosDataHsIdx(i) = NaN;
+    <span class="keyword">else</span>
+        continuosDataHsIdx(i) = ix;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+cdhsi = continuosDataHsIdx;
+<span class="keyword">for</span> strd = 1:length(cdhsi)-1
+    <span class="keyword">if</span> ~isnan(cdhsi(strd)) &amp;&amp; ~isnan(cdhsi(strd+1))
+        sdL = continuousDataL(cdhsi(strd):cdhsi(strd+1));
+        sdTime = continuosDataTime(cdhsi(strd):cdhsi(strd+1));
+    <span class="keyword">else</span>
+        sdL = [];
+        sdTime = [];
+    <span class="keyword">end</span> <span class="comment">% nan strides will be empty</span>
+    strideDataL{strd,1} = sdL; <span class="comment">%(~cellfun('isempty',sdL)); %remove empty cells</span>
+    strideDataTime{strd,1} = sdTime; <span class="comment">%(~cellfun('isempty',sdL)); %remove empty cells</span>
+<span class="keyword">end</span>
+<span class="comment">% resample each cell and writing to matrix</span>
+resampleL = NaN(size(strideDataL,1),100);
+<span class="keyword">for</span> ci = 1:size(strideDataL,1)
+    a = strideDataL{ci,1};
+    x = strideDataTime{ci,1};
+    <span class="keyword">if</span> ~isempty(x) &amp;&amp; length(x) &gt; 1
+        xres = linspace(x(1),x(end), nSamp);
+        y = interp1(x,a,xres);
+        resampleL(ci,:) = y;
+    <span class="keyword">else</span>
+        resampleL(ci,:) = NaN(1,nSamp);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+gaitResampledR = resampleR;
+gaitResampledL = resampleL;
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in resampleToPercentGait (line 15)
+for i = 1:length(hsR)
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2021a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [gaitResampledR,gaitResampledL] = resampleToPercentGait(continuousDataR,...
+continuousDataL,continuosDataTime, hsR, hsL)
+global F
+nSamp = 100;
+% resampleToPercentGaitCycle
+% 1) we input data that reflects the time profile of the data (position,
+% forces, dynamics, kinematics etc.)
+% 2) using heel strikes we trim the continuos profile into a cell structure
+% that includes the time profile of each stride (one stride per row)
+% 3) identify the force time integral, peak heel strike and toe off forces
+
+% break down into each stride hsR and hsL are in time, we want to find the
+% time in continuosDataTime that is closest to the hs time, then we want to
+% save these indices
+for i = 1:length(hsR)
+    ix = find(continuosDataTime < hsR(i),1,'last');
+    if isempty(ix)
+        continuosDataHsIdx(i) = NaN;
+    else
+        continuosDataHsIdx(i) = ix;
+    end
+end
+cdhsi = continuosDataHsIdx;
+for strd = 1:length(cdhsi)-1
+    if ~isnan(cdhsi(strd)) && ~isnan(cdhsi(strd+1))
+        sdR = continuousDataR(cdhsi(strd):cdhsi(strd+1));
+        sdTime = continuosDataTime(cdhsi(strd):cdhsi(strd+1));
+    else
+        sdR = [];
+        sdTime = [];
+    end % nan strides will be empty
+    strideDataR{strd,1} = sdR; %(~cellfun('isempty',sdR)); %remove empty cells
+    strideDataTime{strd,1} = sdTime; %(~cellfun('isempty',sdR)); %remove empty cells
+end
+% resample each cell and writing to matrix
+resampleR = NaN(size(strideDataR,1),100);
+for ci = 1:size(strideDataR,1)
+    a = strideDataR{ci,1};
+    x = strideDataTime{ci,1};
+    if ~isempty(x) && length(x) > 1
+        xres = linspace(x(1),x(end), nSamp);
+        y = interp1(x,a,xres);
+        resampleR(ci,:) = y;
+    else
+        resampleR(ci,:) = NaN(1,nSamp);
+    end
+end
+% LEFT
+for i = 1:length(hsL)
+    ix = find(continuosDataTime < hsL(i),1,'last');
+    if isempty(ix)
+        continuosDataHsIdx(i) = NaN;
+    else
+        continuosDataHsIdx(i) = ix;
+    end
+end
+cdhsi = continuosDataHsIdx;
+for strd = 1:length(cdhsi)-1
+    if ~isnan(cdhsi(strd)) && ~isnan(cdhsi(strd+1))
+        sdL = continuousDataL(cdhsi(strd):cdhsi(strd+1));
+        sdTime = continuosDataTime(cdhsi(strd):cdhsi(strd+1));
+    else
+        sdL = [];
+        sdTime = [];
+    end % nan strides will be empty
+    strideDataL{strd,1} = sdL; %(~cellfun('isempty',sdL)); %remove empty cells
+    strideDataTime{strd,1} = sdTime; %(~cellfun('isempty',sdL)); %remove empty cells
+end
+% resample each cell and writing to matrix
+resampleL = NaN(size(strideDataL,1),100);
+for ci = 1:size(strideDataL,1)
+    a = strideDataL{ci,1};
+    x = strideDataTime{ci,1};
+    if ~isempty(x) && length(x) > 1
+        xres = linspace(x(1),x(end), nSamp);
+        y = interp1(x,a,xres);
+        resampleL(ci,:) = y;
+    else
+        resampleL(ci,:) = NaN(1,nSamp);
+    end
+end
+gaitResampledR = resampleR;
+gaitResampledL = resampleL;          
+end
+##### SOURCE END #####
+--></body></html>

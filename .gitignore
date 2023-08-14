@@ -4,6 +4,11 @@ viconmatlab_starter/csvData_v2/
 viconmatlab_starter/matData_v2/
 viconmatlab_starter/working_10Mar2023/matData_v2
 *.csv
+*.mot
+*.trc
+*.osim
+*.xml
+
 !*.m
 *.7z
 *.zip

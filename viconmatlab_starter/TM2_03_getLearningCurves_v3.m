@@ -85,7 +85,25 @@ for subj = 1:subject.n
                         steptimeL0(i) = NaN;
                     end
                     i = i + 1;
-                end               
+                end  
+                
+                %% steptime WITHOUT hsRvalid and hsLvalid %%%%%%%%%%%%
+%                 i = 1; clear steptimeR0 steptimeL0
+%                 while i < minhs
+%                     % step time on the right leg
+%                     if hsL(1) < hsR(1)
+%                         steptimeR0(i) = hsR(i) - hsL(i);
+%                     elseif hsL(1) > hsR(1)
+%                         steptimeR0(i) = hsR(i+1) - hsL(i);
+%                     end
+%                     % steptime on the left leg
+%                     if hsR(1) < hsL(1)
+%                         steptimeL0(i) = hsL(i) - hsR(i);
+%                     elseif hsR(1) > hsL(1)
+%                         steptimeL0(i) = hsL(i+1) - hsR(i);
+%                     end
+%                     i = i + 1;
+%                 end
                 %% match the lengths %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
                 met_length = [length(steplengthR0) length(steplengthL0);...
                     length(steptimeR0) length(steptimeL0)];

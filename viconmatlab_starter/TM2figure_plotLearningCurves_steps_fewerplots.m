@@ -9,17 +9,17 @@ for subj = 10 % 1:subject.n Lkt(fot dragging)
             effcond
             blk
             %% the step asymmetries
-            steplength1 = asym(subj).steplength_r{effcond,blk}; % = steplength1;
-            steplength2 = asym(subj).steplength_l{effcond,blk}; % = steplength2;
+            steplength1 = F(subj).steplengthR{effcond,blk}; % asym(subj).steplength_r{effcond,blk}; % = steplength1;
+            steplength2 = F(subj).steplengthL{effcond,blk}; % asym(subj).steplength_l{effcond,blk}; % = steplength2;
 %             % uncomment for step width
 %             steplength1 = asym(subj).stepwidth_r{effcond,blk}; % = steplength1;
 %             steplength2 = asym(subj).stepwidth_l{effcond,blk}; % = steplength2;
                 % should update labels on plots so this is consistent
-            maxsteps = asym(subj).nsteps{effcond,blk}; % = maxsteps;
-            steplength_asym = asym(subj).asymlength{effcond,blk};% = steplength_asym;
-            steptime1 = asym(subj).steptime_r{effcond,blk}; % = steptime1;
-            steptime2 = asym(subj).steptime_l{effcond,blk}; % = steptime2;
-            steptime_asym = asym(subj).steptime_asym{effcond,blk};
+            maxsteps = F(subj).nsteps{effcond,blk}; % = maxsteps;
+            steplength_asym = asym(subj).steplength{effcond,blk};% = steplength_asym;
+            steptime1 = F(subj).steptimeR{effcond,blk}; % = steptime1;
+            steptime2 = F(subj).steptimeL{effcond,blk}; % = steptime2;
+            steptime_asym = asym(subj).steptime{effcond,blk};
             %% determine plot color
             if effcond == 1
                 if blk == 4 || blk == 6
