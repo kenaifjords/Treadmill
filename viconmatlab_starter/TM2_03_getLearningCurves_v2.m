@@ -14,7 +14,7 @@ for subj = 1:subject.n
              i=1;
              clear steptime1 steptime2 steplength2all steplength1all ...
                  steplength1 steplength2 hsL_time hsR_time hsL hsR
-            if ~isempty(F{subj}.hsR{effcond,blk}) && ~isempty(F{subj}.hsL{effcond,blk})
+            if ~isempty(F(subj).hsR{effcond,blk}) && ~isempty(F(subj).hsL{effcond,blk})
                  %% identify whether the first step is spurious and whether the 
                     % first step was on the fast leg
                 fastleg1st = 0;
@@ -23,7 +23,7 @@ for subj = 1:subject.n
                 % treadmill? - this identifies the true first step and removes
                 % the spurious ones
                 fir = 1;
-                while F{subj}.hsR{effcond, blk}(fir) == F{subj}.hsL{effcond, blk}(fir)
+                while F(subj).hsR{effcond, blk}(fir) == F(subj).hsL{effcond, blk}(fir)
                         fir = fir + 1;
                         if fir > 3
                             % sets up an error in case the code idenifies the
@@ -33,25 +33,25 @@ for subj = 1:subject.n
                         end
                 end
                 % we trim the heelstrike vectors accordingly
-                hsR_time = F{subj}.hsR{effcond, blk}(fir:end);
-                hsL_time = F{subj}.hsL{effcond, blk}(fir:end);
+                hsR_time = F(subj).hsR{effcond, blk}(fir:end);
+                hsL_time = F(subj).hsL{effcond, blk}(fir:end);
 
-                i_hsL = F{subj}.hsL_idx{effcond, blk}(fir:end);%(2:end);
-                i_hsR = F{subj}.hsR_idx{effcond, blk}(fir:end);%(2:end);
+                i_hsL = F(subj).hsL_idx{effcond, blk}(fir:end);%(2:end);
+                i_hsR = F(subj).hsR_idx{effcond, blk}(fir:end);%(2:end);
                 %% step length %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                steplength2all = p{subj}.Lankle{effcond, blk}(i_hsL,2) - ...
-                     p{subj}.Rankle{effcond, blk}(i_hsL,2);
-                 steplength1all = p{subj}.Rankle{effcond, blk}(i_hsR,2) - ...
-                     p{subj}.Lankle{effcond, blk}(i_hsR,2);
+                steplength2all = p(subj).Lankle{effcond, blk}(i_hsL,2) - ...
+                     p(subj).Rankle{effcond, blk}(i_hsL,2);
+                 steplength1all = p(subj).Rankle{effcond, blk}(i_hsR,2) - ...
+                     p(subj).Lankle{effcond, blk}(i_hsR,2);
                  
                  % for a case of subject when the ankle marker fell off
                  if strcmp('MLL', subject.list(subj))
                      if effcond == 2
                          if blk == 5
-                             steplength2all = p{subj}.Lheel{effcond, blk}(i_hsL,2) - ...
-                                p{subj}.Rheel{effcond, blk}(i_hsL,2);
-                             steplength1all = p{subj}.Rankle{effcond, blk}(i_hsR,2) - ...
-                                p{subj}.Lheel{effcond, blk}(i_hsR,2);
+                             steplength2all = p(subj).Lheel{effcond, blk}(i_hsL,2) - ...
+                                p(subj).Rheel{effcond, blk}(i_hsL,2);
+                             steplength1all = p(subj).Rankle{effcond, blk}(i_hsR,2) - ...
+                                p(subj).Lheel{effcond, blk}(i_hsR,2);
                          end
                      end
                  end
@@ -79,7 +79,7 @@ for subj = 1:subject.n
                         if subject.fastleg(subj) == 1 %subject.fastleg(subj,effcond) == 1
                             fastleg1st = 1;
                         end
-                    elseif hsR_time(1) > hsL_time(1) %F{subj}.hsL{effcond, blk}(fir) % fp2 strikes first so take its second heel strike
+                    elseif hsR_time(1) > hsL_time(1) %F(subj).hsL{effcond, blk}(fir) % fp2 strikes first so take its second heel strike
                         steptime2(i)= hsL_time(i+1) - hsR_time(i);
                         if subject.fastleg(subj) == 2 %$subject.fastleg(subj,effcond) == 2
                             fastleg1st = 1;
@@ -92,7 +92,7 @@ for subj = 1:subject.n
                         if subject.fastleg(subj) == 2 %subject.fastleg(subj,effcond) == 2
                             fastleg1st = 1;
                         end
-                    elseif hsL_time(1) > hsR_time(1) % F{subj}.hsL{effcond, blk}(fir)>F{subj}.hsR{effcond, blk}(fir) %fp1 strikes first so take its second heel strike
+                    elseif hsL_time(1) > hsR_time(1) % F(subj).hsL{effcond, blk}(fir)>F(subj).hsR{effcond, blk}(fir) %fp1 strikes first so take its second heel strike
                         steptime1(i)= hsR_time(i+1) - hsL_time(i);
                         if subject.fastleg(subj) == 1 %subject.fastleg(subj,effcond) == 1
                             fastleg1st = 1;
@@ -108,10 +108,10 @@ for subj = 1:subject.n
     %             steptime2=steptime2(1:maxsteps_time); 
     %             
     %             % trim heel strike time vectors
-    %             hsLall = F{subj}.hsL{effcond,blk};
+    %             hsLall = F(subj).hsL{effcond,blk};
     %             hsL_time = hsLall(fir:maxsteps_time) - hsLall(fir); % arrange 
     %                 % all according to the first valid step - NEED TO CHECK THE LOGIC HERE
-    %             hsRall = F{subj}.hsR{effcond,blk};
+    %             hsRall = F(subj).hsR{effcond,blk};
     %             hsR_time = hsRall(fir:maxsteps_time) - hsRall(fir);
     %             
     %             

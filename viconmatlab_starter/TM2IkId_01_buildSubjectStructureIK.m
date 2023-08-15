@@ -35,8 +35,8 @@ for subj = 1:subject.n
     cd([homepath '\matData_IKID'])
     a = load(file_ik);
     b = load(file_id);
-    IK{subj} = a.ik;
-    ID{subj} = b.id;
+    IK(subj) = a.ik;
+    ID(subj) = b.id;
 end
 cd(homepath)
 clearvars -except IK subject homepath colors ID
