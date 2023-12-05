@@ -3,6 +3,8 @@ viconmatlab_starter/matData/
 viconmatlab_starter/csvData_v2/
 viconmatlab_starter/matData_v2/
 viconmatlab_starter/working_10Mar2023/matData_v2
+viconmatlab_starter/dla_effortandsplitbelt_Oct2023scripts/matData_v2
+viconmatlab_starter/bootstrap_data
 *.csv
 *.mot
 *.trc

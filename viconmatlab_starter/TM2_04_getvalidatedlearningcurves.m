@@ -9,6 +9,9 @@ for subj = 1:subject.n
             break
         end
         for blk = 1:subject.nblk
+            if blk > size(F(subj).R,2)
+                break
+            end
             % clear and initialize
             clear hsR hsL ihsR ihsR
             clear steptimeR0 steptimeL0 steptimeR1 steptimeL0 steptimeL1

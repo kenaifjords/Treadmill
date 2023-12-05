@@ -8,13 +8,11 @@ endpertstep = 30;
 plot_all = 1;
 includeblk = 4:6;
 for subj = 1:subject.n
-    if subject.order(subj,1) ~= 0
-        effuse  = 1:2;
-    elseif subject.order(subj,1) == 0
-        effuse = 3;
-    end
-    for effcond = effuse
-        for blk = 1:subject.nblk % includeblk %1:subject.nblk
+    for effcond = 1:size(F(subj).R,1)
+        for blk = 1:size(F(subj).R,2) % subject.nblk % includeblk %1:subject.nblk
+            if isempty(F(subj).R{effcond,blk})
+                break
+            end
             % y force
             trimasym = min(asym_all.asymlengthy(:,effcond,blk));
             brk = asym(subj).brakeforcey{effcond,blk};
@@ -67,35 +65,36 @@ if plot_all
 figure();
 getBarPlot_asymmetry(hf,lf,hs,ls,'Braking force Y')
 figure();
-getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'Braking force Y')
+getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'Braking force Y',[-0.5 0.5])
 
 % pushing
 [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.push);
 figure();
-getBarPlot_asymmetry(hf,lf,hs,ls,'Push off force Y')
+getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'Push off force Y',[-0.5 0.5])
 
 % push off impulse
 [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.impulse);
 figure();
-getBarPlot_asymmetry(hf,lf,hs,ls,'Push off Force Impulse')
+getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'Push off Force Impulse',[-0.5 0.5])
 
 % heel strike z
 [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.heel);
 figure();
-getBarPlot_asymmetry(hf,lf,hs,ls,'Heel Strike Fz')
+getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'Heel Strike Fz',[-0.5 0.5])
 
 % minstance fz
 [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.minstance);
 figure();
-getBarPlot_asymmetry(hf,lf,hs,ls,'minstance Fz')
+getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'minstance Fz',[-0.5 0.5])
 
 % toe off z
 [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.toe);
 figure();
-getBarPlot_asymmetry(hf,lf,hs,ls,'Toe Off Fz')
+getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'Toe Off Fz',[-0.5 0.5])
 end
+%%
 
-splitbeltbarplot(blk,brake)
+% splitbeltbarplot(blk,brake)
 % brake
 % push
 % impulse

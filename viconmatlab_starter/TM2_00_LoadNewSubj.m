@@ -14,13 +14,19 @@ trim_time_end = 100;
 % take the mat files for each subject and build a full structure, so that
 % we can loop through subjects - PREFER ONE SUBJECT AT A TIME
 %% add subject code here and change effort condition(s) in line 32
-subject.list =  { 'NVN' 'WSN' 'HKS' }; 
+subject.list =  { 'DXI' };
 
 % 'MAC' 'BAN' 'MLL' 'FUM' 'QPQ' 
 % 'BAB' 'CFL' 'COM' 'KJC' 'LKT'    
 % 'HZO' 'MLU' 'BEO' 'DCU' 'HKS'%
 % 'WSN' 'NVN' 'EHC' 'FWN' 'MFT'%
-% 'BVL' 'IQM' 'MYP' %
+% 'BVL' 'IQM' 'MYP' 'DXI' 'MGC'%
+% 'CND' 'DVN' 'DOT' 'QQX' 'ECC'
+% 'LYT' 'CMT' 'BCT' 'QWE' 'DHB'
+% 'BKJ' 'IGK'
+
+% 'TWD' 'UKW' 'CBO' 'EPN' 'MKT'
+% 'QKQ' 'EFT' 'TKH'
 % 'BAX'
 subject.blockname = {'base1' 'base2' 'base3' 'split1' 'wash1' 'split2' 'wash2'};
 subject.effortcondition = {'high','low','control'};
@@ -32,7 +38,7 @@ for subj = 1:length(subject.list)
     savename_marker = [subject.list{subj} '_p.mat'];
     subjindx = find(ismember(trimindices.subject,subject.list{subj}));
 
-    for effcond = 1:3 %3 %1:3 % high, low, control length(subject.effortcondition)+1 %effort condition: 1 is high
+    for effcond = 1:3% 1:2%:3 %3 %1:3 % high, low, control length(subject.effortcondition)+1 %effort condition: 1 is high
 %         if effcond == 1
 %             savename_force = [subject.list{subj} '_HF.mat'];       
 %             savename_marker = [subject.list{subj} '_Hp.mat'];
@@ -61,6 +67,8 @@ for subj = 1:length(subject.list)
                 [devicedata,trajdata0] = readviconcsv_rmmV2(subjpath,filename);
             else
                 devicedata = []; trajdata0 = [];
+                fprintf('empty device data');
+                disp(filename)
             end
             
             trim_time = eval([tableloc '(subjindx)']);

@@ -1,4 +1,4 @@
-function[devicedata,trajdata] = readviconcsv(path,filename)% mfile to load .csv vicon files
+function[devicedata,trajdata] = readviconcsv%(path,filename)% mfile to load .csv vicon files
 global homepath
 homepath = pwd;
 % close all 

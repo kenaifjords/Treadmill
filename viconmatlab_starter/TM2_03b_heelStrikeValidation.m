@@ -17,7 +17,7 @@ tic
              clear rhs lhs rfirst vi vj
              clear validr validl
              % get the heel strikes
-             if effcond <= size(F(subj).R,1) && ~isempty(F(subj).hsR{effcond,blk}) && ~isempty(F(subj).hsL{effcond,blk})
+             if effcond <= size(F(subj).R,1) && blk <= size(F(subj).R,2) && ~isempty(F(subj).hsR{effcond,blk}) && ~isempty(F(subj).hsL{effcond,blk})
                  rhs = F(subj).hsR{effcond,blk}; % size(rhs)
                  lhs = F(subj).hsL{effcond,blk}; % size(lhs)   
              

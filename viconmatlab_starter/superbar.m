@@ -227,7 +227,7 @@
 % CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
-function varargout = superbar(X, Y, varargin)
+function X = superbar(X, Y, varargin) %varargout = superbar(X, Y, varargin)
 % Check number of inputs is okay
 if exist('narginchk', 'builtin')
     narginchk(1, Inf);
