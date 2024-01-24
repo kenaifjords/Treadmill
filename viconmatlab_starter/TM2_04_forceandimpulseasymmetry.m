@@ -7,22 +7,30 @@ normtobodymass = 0;
 normtoslowbaseline = 0;
 dt = 1/100;
 for subj = 1:subject.n
-    if subject.order(subj,:) == [0 0]
-        effuse = 3;
-    else
-        effuse = 1:2;
-    end
+%     if subject.order(subj,:) == [0 0]
+%         effuse = 3;
+%     else
+%         if size(F(subj).R,1) < 2
+%             effuse = 1;
+%         else
+%             effuse = 1:2;
+%         end
+%     end
     %% braking push off and impulse
-    for effcond = effuse
+    for effcond = 1:size(F(subj).R,1)
         if normtoslowbaseline
             blk = 2;
             normyr = mean(F(subj).R{effcond,blk}(:,2),'omitnan');
             normyl = mean(F(subj).L{effcond,blk}(:,2),'omitnan');
         end
-        for blk = 1:subject.nblk
+        for blk = 1:size(F(subj).R,2) %subject.nblk
+            if(isempty(F(subj).R{effcond,blk}))
+                break
+            end
             clear fyr fyl fzr fzl ftime sdRy sdLy sdRz sdLz
             clear ify ify0 rimp limp rbrk lbrk rpsh lpsh
             clear asymbrk asympsh asymimp
+            
             fyr = F(subj).R{effcond,blk}(:,2);
             fyl = F(subj).L{effcond,blk}(:,2);
             if normtobodymass
@@ -147,13 +155,11 @@ for subj = 1:subject.n
 end % subj
 %% peak grf
 for subj = 1:subject.n
-    if subject.order(subj,:) == [0 0]
-        effuse = 3;
-    else
-        effuse = 1:2;
-    end
-    for effcond = effuse
-        for blk = 1:subject.nblk
+    for effcond = 1:size(F(subj).R,1)
+        for blk = 1:size(F(subj).R,2) % subject.nblk
+            if isempty(F(subj).R{effcond,blk})  
+                break
+            end
             clear fzr fzl fyr fyl ftime sdRz sdLz
             clear ycross ymin  ymax rheelf lheelf rtoef ltoef rminf lminf
             clear asymheel asymtoe asymmin
@@ -298,13 +304,11 @@ end % subj
 
 %% build asymmetry matrix
 for subj = 1:subject.n
-    if subject.order(subj,1) ~= 0
-        effuse  = 1:2;
-    elseif subject.order(subj,1) == 0
-        effuse = 3;
-    end
-    for effcond = effuse
-        for blk = 1:subject.nblk
+    for effcond = 1:size(F(subj).R,1)
+        for blk = 1:size(F(subj).R,2) %subject.nblk
+            if isempty(F(subj).R{effcond,blk})
+                break
+            end
             % y force
             trimasym = min(asymlengthy(:,:,blk),[],'all');
             brk = asym(subj).brakeforcey{effcond,blk};

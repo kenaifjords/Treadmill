@@ -11,13 +11,13 @@ end
 
 blkinclude = 4:6;
 for subj = 1:subject.n
-    if subject.order(subj,1) ~= 0
-        effuse  = 1:2;
-    elseif subject.order(subj,1) == 0
-        effuse = 3;
-    end
-    for effcond = effuse
-        for blk = 1:subject.nblk
+%     if subject.order(subj,1) ~= 0
+%         effuse  = 1:2;
+%     elseif subject.order(subj,1) == 0
+%         effuse = 3;
+%     end
+    for effcond = 1:size(F(subj).R,1)
+        for blk = 1:size(F(subj).R,2) % subject.nblk
             rvalid = F(subj).validstepR{effcond,blk};
             lvalid = F(subj).validstepL{effcond,blk};
             sizevalid(subj,effcond,blk) = min([length(rvalid),length(lvalid)]);
@@ -26,15 +26,10 @@ for subj = 1:subject.n
 end
 
 sizevalid(sizevalid == 0) = NaN;
-
+%%
 for subj = 1:subject.n
-    if subject.order(subj,1) ~= 0
-        effuse  = 1:2;
-    elseif subject.order(subj,1) == 0
-        effuse = 3;
-    end
-    for effcond = effuse
-        for blk = 1:subject.nblk
+    for effcond = 1:size(F(subj).R,1)
+        for blk = 1:size(F(subj).R,2) % subject.nblk
             trimasym = min(sizevalid(:,effcond,blk)) - 1;
             % steplength
             if normtoslowbaseline || normtofastbaseline
@@ -82,11 +77,14 @@ end
 
 %% plot unilateral step length
 figure(101); hold on;
-plotFastSlowCompareCurves(blkinclude,'steplength (norm to baseline slow)',...
+plotFastSlowCompareCurves(blkinclude,'steplength (/ baseline slow)',...
     fastlength,slowlength);
 figure(1010); hold on;
-plotFastSlowCompareCurves(4,'steplength (norm to baseline slow)',...
-    fastlength,slowlength);
+plotFastSlowCompareCurves(4,'steplength',...
+    fastlength,slowlength); % normed to baseline slow step length (division)
+figure(110);
+plotFastSlowCompareCurves(6,'steplength',...
+    fastlength,slowlength); % normed to baseline slow step length (division)
 
 %% unilateral step time
 [fasttime.hfirst,fasttime.lfirst,fasttime.hsecond,fasttime.lsecond,fasttime.control] = ...

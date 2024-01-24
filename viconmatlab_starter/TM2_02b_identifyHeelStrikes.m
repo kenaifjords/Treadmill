@@ -22,7 +22,7 @@ for subj = 1:subject.n
 %                 F(subj).time{effcond,blk} = time;
 %                 % end clean up time
                 disp([subject.list{subj} '(' num2str(subj) ') ' '| effcond: ' num2str(effcond) ' | blk: ' num2str(blk)]);
-                if size(F(subj).R,1) >= effcond && ~isempty(F(subj).R{effcond,blk}) && ~isempty(F(subj).L{effcond,blk})
+                if size(F(subj).R,1) >= effcond && size(F(subj).R,2) >= blk && ~isempty(F(subj).R{effcond,blk}) && ~isempty(F(subj).L{effcond,blk})
                     clear stepind stepvalid
                     [p(subj).hsR{effcond,blk},p(subj).hsL{effcond,blk},p(subj).toR{effcond,blk},p(subj).toL{effcond,blk}] =...
                         getHeelStrikeMarker(p(subj).Rtoe{effcond,blk},p(subj).Ltoe{effcond,blk},...

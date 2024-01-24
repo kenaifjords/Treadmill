@@ -12,7 +12,7 @@ devicefs = 1000; %1000 Hz for the treadmill, 100Hz for cameras
 trajfs = 100; %   100Hz for cameras
 %% Read in vicon data from CSV file
 
-[devicedata,trajdata] = readviconcsv(path,filename);
+[devicedata,trajdata] = readviconcsv;%(path,filename);
 
 %% Sort Data
 %Forecplate1 (Left)  Z is up/down b/c COP is zero; Y is in the direction of
@@ -22,7 +22,7 @@ trajfs = 100; %   100Hz for cameras
 % subject rather than on the forceplatform
 
 dataraw=devicedata;
-dataraw(:,[3:5 6:8 18:20 21:23])=-dataraw(:,[3:5 6:8 18:20 21:23]);
+% dataraw(:,[3:5 6:8 18:20 21:23])=-dataraw(:,[3:5 6:8 18:20 21:23]);
 
 % F1 = [dataraw(:,3) dataraw(:,4) dataraw(:,5)];  %N, 
 % M1 = [dataraw(:,6) dataraw(:,7) dataraw(:,8)];  %Nmm
@@ -39,29 +39,81 @@ dataraw(:,[3:5 6:8 18:20 21:23])=-dataraw(:,[3:5 6:8 18:20 21:23]);
 
 % Filter
 % Select only (16 col) : F1xF1yF1zM1xM1yM1zCOP1xCOP1yF2xF2yF2zM2xM2yM2zCOP2xCOP2y
-dataraw = dataraw(:,[3:10 18:25]);
-fs = devicefs;
-fc=20;
-dt=1/fs;
 
-time=[1:size(dataraw,1)]/fs;
-trajtime=[1:size(trajdata,1)]/trajfs;
+if size(dataraw,2) < 30
+%                 dataraw = cat(2,dataraw,nan(size(dataraw,1), 30 - size(dataraw,2)));
+%                 disp(['PINS probably missing. INCOMPLETE CSV, NaNs added. Effort condition: ' num2str(effcond) ' block: ' num2str(blk)]);
+                dataraw(:,[3:5 6:8 12:14 15:17])=-dataraw(:,[3:5 6:8 12:14 15:17]);
+                % get time
+                fs = devicefs; % data collection hz
+                fc = 20; % low pass filter frequency cut off
+                dt = 1/fs; % numerical integration time steps
+                time = (1:size(dataraw,1))/fs;
+                
+                % F1xF1yF1zM1xM1yM1zCOP1xCOP1yF2xF2yF2zM2xM2yM2zCOP2xCOP2y
+                % Select only (16 col)
+                dataraw = dataraw(:,[3:10 12:19]);
+                
+                dataraw(isnan(dataraw))=0;
+                % filter data : datafilt is original:derivative:secondderivative
+                [datafilt]=diff23f5(dataraw,dt,fc);
+                data=datafilt(:,1:size(dataraw,2)); %filtered data, not derivatives
+                %Forecplate1 (Right)
+                F1 = [data(:,1) data(:,2) data(:,3)];  %N - force
+                M1 = [data(:,4) data(:,5) data(:,6)];  %Nmm - moment
+                COP1 = [data(:,7) data(:,8) ]; %mm - center of pressure
+                %Forecplate2 (Left)
+                F2 = [data(:,9) data(:,10) data(:,11)];  %N, 
+                M2 = [data(:,12) data(:,13) data(:,14)];  %Nmm
+                COP2 = [data(:,15) data(:,16) ]; %mm
+            else
+                dataraw(:,[3:5 6:8 18:20 21:23])=-dataraw(:,[3:5 6:8 18:20 21:23]);
+                % Select only (16 col)
+                % F1xF1yF1zM1xM1yM1zCOP1xCOP1yF2xF2yF2zM2xM2yM2zCOP2xCOP2y
+                dataraw = dataraw(:,[3:10 18:25]);
+                fs = devicefs; % data collection hz
+                fc = 20; % low pass filter frequency cut off
+                dt = 1/fs; % numerical integration time steps
+                % get time
+                time = (1:size(dataraw,1))/fs;
+                dataraw(isnan(dataraw))=0;
+                
+                % filter data : datafilt is original:derivative:secondderivative
+                [datafilt]=diff23f5(dataraw,dt,fc);
+                data=datafilt(:,1:size(dataraw,2)); %filtered data, not derivatives
+                %Forecplate1 (Right)
+                F1 = [data(:,1) data(:,2) data(:,3)];  %N - force
+                M1 = [data(:,4) data(:,5) data(:,6)];  %Nmm - moment
+                COP1 = [data(:,7) data(:,8) ]; %mm - center of pressure
+                %Forecplate2 (Left)
+                F2 = [data(:,9) data(:,10) data(:,11)];  %N, 
+                M2 = [data(:,12) data(:,13) data(:,14)];  %Nmm
+                COP2 = [data(:,15) data(:,16) ]; %mm
+            end
 
-dataraw(isnan(dataraw))=0;
-[datafilt]=diff23f5(dataraw,dt,fc);
-
-%Take only filtered data (not derivatives)
-data=datafilt(:,1:size(dataraw,2));
-
-%Forecplate1 (Right)
-F1 = [data(:,1) data(:,2) data(:,3)];  %N, 
-M1 = [data(:,4) data(:,5) data(:,6)];  %Nmm
-COP1 = [data(:,7) data(:,8) ]; %mm
-
-%Forecplate2 (Left)
-F2 = [data(:,9) data(:,10) data(:,11)];  %N, 
-M2 = [data(:,12) data(:,13) data(:,14)];  %Nmm
-COP2 = [data(:,15) data(:,16) ]; %mm
+% dataraw = dataraw(:,[3:10 18:25]);
+% fs = devicefs;
+% fc=20;
+% dt=1/fs;
+% 
+% time=[1:size(dataraw,1)]/fs;
+% trajtime=[1:size(trajdata,1)]/trajfs;
+% 
+% dataraw(isnan(dataraw))=0;
+% [datafilt]=diff23f5(dataraw,dt,fc);
+% 
+% %Take only filtered data (not derivatives)
+% data=datafilt(:,1:size(dataraw,2));
+% 
+% %Forecplate1 (Right)
+% F1 = [data(:,1) data(:,2) data(:,3)];  %N, 
+% M1 = [data(:,4) data(:,5) data(:,6)];  %Nmm
+% COP1 = [data(:,7) data(:,8) ]; %mm
+% 
+% %Forecplate2 (Left)
+% F2 = [data(:,9) data(:,10) data(:,11)];  %N, 
+% M2 = [data(:,12) data(:,13) data(:,14)];  %Nmm
+% COP2 = [data(:,15) data(:,16) ]; %mm
 
 F1old=F1;
 F2old=F2;
@@ -123,25 +175,25 @@ figure
 % plot(F2(:,2),'r')
 % title('Y forces')
 
-subplot(313)
-plot(F1(:,3))
-hold on
-plot(F2(:,3),'r')
-title('Z forces')
+% % subplot(313)
+% plot(F1(:,3))
+% hold on
+% plot(F2(:,3),'r')
+% title('Z forces')
 
 
 
 %% Marker data
-vicon_stick(trajdata,trajtime, animateyes)
+% vicon_stick(trajdata,trajtime, animateyes)
 
 %%
-figure
-plot(trajtime,pRankle(:,2))
-hold on
-plot(trajtime,pLankle(:,2),'g')
-title('Ankle Marker')
-xlabel('Position (Y) (mm)')
-ylabel('Time (s)')
+% figure
+% plot(trajtime,pRankle(:,2))
+% hold on
+% plot(trajtime,pLankle(:,2),'g')
+% title('Ankle Marker')
+% xlabel('Position (Y) (mm)')
+% ylabel('Time (s)')
 
 %% Identify heelstrike
 time=resample(timeold,1,10);
@@ -180,71 +232,71 @@ plot(hsfp2,F2(ind_hsfp2,3),'ko')
 plot(tofp2,F2(ind_tofp2,3),'k*')
 title('Heel Strikes')
 xlabel('Time (s)')
-ylabel('Heel Marker Height (mm)')
+ylabel('force')
 
 disp([length(hsfp1) length(hsfp2)])
 disp([length(tofp1) length(tofp2)])
-%% Calculate steplength, steptime, and steplength asymmetry
+% %% Calculate steplength, steptime, and steplength asymmetry
+% % 
 % 
-
-i=1;
-clear steptime1 steptime2
-
-steplength2all=pLankle(ind_hsfp2,2)-pRankle(ind_hsfp2,2);
-steplength1all=pRankle(ind_hsfp1,2)-pLankle(ind_hsfp1,2);
-
-maxsteps=min([length(steplength1all) length(steplength2all)]);
-steplength1=steplength1all(1:maxsteps);
-steplength2=steplength2all(1:maxsteps); 
-    
-while i < min([length(hsfp1) length(hsfp2)])    
-    %step time on belt 2 (left)
-    if hsfp1(1)<hsfp2(1)   %fp1 strikes first
-     steptime2(i)= hsfp2(i)-hsfp1(i);
-    elseif hsfp1(1)>hsfp2(1) %fp2 strikes first so take its second heel strike
-     steptime2(i)= hsfp2(i+1)-hsfp1(i); 
-    end
- 
-    %step time on belt 1 (right)
-     if hsfp2(1)<hsfp1(1)   %fp2 strikes first
-     steptime1(i)= hsfp1(i)-hsfp2(i);
-    elseif hsfp2(1)>hsfp1(1) %fp1 strikes first so take its second heel strike
-     steptime1(i)= hsfp1(i+1)-hsfp2(i);
-     end
-    
-    i=i+1;
-end
-
-%steptime_asym=steptime1-steptime2;
-steplength_asym=(steplength1-steplength2)./(steplength1+steplength2); 
-
-figure
-subplot(211)
-plot(hsfp2(1:maxsteps),steplength1,'bo')
-title('Step Lengths')
-hold on
-plot(hsfp1(1:maxsteps),steplength2,'go')
-ylabel('Length (mm)')
-legend('Right','Left')
-xlabel('Time (s)')
-
-
-subplot(212)
-plot(hsfp1(1:maxsteps),steplength_asym)
-title('Asymmetry (R-L)')
-ylabel('Length (mm)')
-xlabel('Time (s)')
-
-figure
-subplot(211)
-plot(steptime1)
-title('Step Times')
-hold on
-plot(steptime2,'g')
-ylabel('Time (s)')
-legend('Right','Left')
- 
-subplot(212)
-plot(steptime_asym)
-title('Asymmetry (R-L)')
-ylabel('Time (s)')
+% i=1;
+% clear steptime1 steptime2
+% 
+% steplength2all=pLankle(ind_hsfp2,2)-pRankle(ind_hsfp2,2);
+% steplength1all=pRankle(ind_hsfp1,2)-pLankle(ind_hsfp1,2);
+% 
+% maxsteps=min([length(steplength1all) length(steplength2all)]);
+% steplength1=steplength1all(1:maxsteps);
+% steplength2=steplength2all(1:maxsteps); 
+%     
+% while i < min([length(hsfp1) length(hsfp2)])    
+%     %step time on belt 2 (left)
+%     if hsfp1(1)<hsfp2(1)   %fp1 strikes first
+%      steptime2(i)= hsfp2(i)-hsfp1(i);
+%     elseif hsfp1(1)>hsfp2(1) %fp2 strikes first so take its second heel strike
+%      steptime2(i)= hsfp2(i+1)-hsfp1(i); 
+%     end
+%  
+%     %step time on belt 1 (right)
+%      if hsfp2(1)<hsfp1(1)   %fp2 strikes first
+%      steptime1(i)= hsfp1(i)-hsfp2(i);
+%     elseif hsfp2(1)>hsfp1(1) %fp1 strikes first so take its second heel strike
+%      steptime1(i)= hsfp1(i+1)-hsfp2(i);
+%      end
+%     
+%     i=i+1;
+% end
+% 
+% %steptime_asym=steptime1-steptime2;
+% steplength_asym=(steplength1-steplength2)./(steplength1+steplength2); 
+% 
+% figure
+% subplot(211)
+% plot(hsfp2(1:maxsteps),steplength1,'bo')
+% title('Step Lengths')
+% hold on
+% plot(hsfp1(1:maxsteps),steplength2,'go')
+% ylabel('Length (mm)')
+% legend('Right','Left')
+% xlabel('Time (s)')
+% 
+% 
+% subplot(212)
+% plot(hsfp1(1:maxsteps),steplength_asym)
+% title('Asymmetry (R-L)')
+% ylabel('Length (mm)')
+% xlabel('Time (s)')
+% 
+% figure
+% subplot(211)
+% plot(steptime1)
+% title('Step Times')
+% hold on
+% plot(steptime2,'g')
+% ylabel('Time (s)')
+% legend('Right','Left')
+%  
+% subplot(212)
+% plot(steptime_asym)
+% title('Asymmetry (R-L)')
+% ylabel('Time (s)')

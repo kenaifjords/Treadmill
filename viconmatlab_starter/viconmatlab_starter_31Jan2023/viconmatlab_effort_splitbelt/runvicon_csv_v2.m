@@ -40,7 +40,7 @@ dataraw(:,[3:5 6:8 18:20 21:23])=-dataraw(:,[3:5 6:8 18:20 21:23]);
 
 % Filter
 % Select only (16 col) : F1xF1yF1zM1xM1yM1zCOP1xCOP1yF2xF2yF2zM2xM2yM2zCOP2xCOP2y
-pin1 = dataraw(:,[12:17]); pin2 = dataraw(:,[27:32]);
+% pin1 = dataraw(:,[12:17]); pin2 = dataraw(:,[27:32]);
 dataraw = dataraw(:,[3:10 18:25]);
 fs = devicefs;
 fc=20;

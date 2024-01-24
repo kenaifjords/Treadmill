@@ -1,18 +1,16 @@
 % mfile to load .csv vicon files
 global homepath
-homepath = pwd; %'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
+homepath = pwd; 
 close all 
 % clear all 
 
 animateyes=0;
-path = 'C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter';
-%homepath;%,'csvData')
-filename = 'CJG_miniSplotBelt.csv';
+
 devicefs = 1000; %1000 Hz for the treadmill, 100Hz for cameras
 trajfs = 100; %   100Hz for cameras
 %% Read in vicon data from CSV file
 
-[devicedata,trajdata] = readviconcsv(path,filename);
+[devicedata,trajdata] = readviconcsv;%(path,filename);
 
 %% Sort Data
 %Forecplate1 (Left)  Z is up/down b/c COP is zero; Y is in the direction of
