@@ -29,7 +29,7 @@ for subj = 1:subject.n
 
             rvalid = F(subj).validstepR{effcond,blk};
             lvalid = F(subj).validstepL{effcond,blk};
-            
+             
             if ~isempty(hsR) && ~isempty(hsL)
                 % determine the minimum number of heel strikes
                 minhs = min([size(rvalid,1) size(lvalid,1)]);

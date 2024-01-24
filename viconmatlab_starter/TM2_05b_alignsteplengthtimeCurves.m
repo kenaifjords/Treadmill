@@ -87,7 +87,7 @@ ylim([-0.6 0.0])
 plot_with_stderr(0,slength.hfirst{blk},colors.all{1,1}) %% these need to be trimmed to shortest ###
 plot_with_stderr(0,slength.lfirst{blk},colors.all{2,1})
 plot_with_stderr(0,slength.control{blk},colors.all{3,1})
-xlim([0 200])
+% xlim([0 200])
 
 figure(667); hold on; blk = 5;
 ylabel('asymmetry'); xlabel('strides'); title('Washout (1st visit)')
@@ -95,7 +95,7 @@ ylim([0.0 0.60])
 plot_with_stderr(0,slength.hfirst{blk},colors.all{1,1}) %% these need to be trimmed to shortest ###
 plot_with_stderr(0,slength.lfirst{blk},colors.all{2,1})
 plot_with_stderr(0,slength.control{blk},colors.all{3,1})
-xlim([0 200])
+% xlim([0 200])
 
 figure(6697); hold on; blk = 6;
 ylabel('asymmetry'); xlabel('strides'); title('Relearning (1st visit)')
@@ -103,28 +103,28 @@ ylabel('asymmetry'); xlabel('strides'); title('Relearning (1st visit)')
 plot_with_stderr(0,slength.hfirst{blk},colors.all{1,1}) %% these need to be trimmed to shortest ###
 plot_with_stderr(0,slength.lfirst{blk},colors.all{2,1})
 plot_with_stderr(0,slength.control{blk},colors.all{3,1})
-xlim([0 200])
+% xlim([0 200])
 %% plot each block (4,5,6) for the second visit
 figure(695); hold on; blk = 4;
 ylabel('asymmetry'); xlabel('strides'); title('Learning (2nd visit)')
 ylim([-0.4 0.1])
 plot_with_stderr(0,slength.hsecond{blk},colors.all{1,1}) %% these need to be trimmed to shortest ###
 plot_with_stderr(0,slength.lsecond{blk},colors.all{2,1})
-xlim([0 200])
+% xlim([0 200])
 
 figure(696); hold on; blk = 5;
 ylabel('asymmetry'); xlabel('strides'); title('Washout (2nd visit)')
 ylim([-0.1 0.40])
 plot_with_stderr(0,slength.hsecond{blk},colors.all{1,1}) %% these need to be trimmed to shortest ###
 plot_with_stderr(0,slength.lsecond{blk},colors.all{2,1})
-xlim([0 200])
+% xlim([0 200])
 
 figure(697); hold on; blk = 6;
 ylabel('asymmetry'); xlabel('strides'); title('Relearning (2nd visit)')
 ylim([-0.4 0.1])
 plot_with_stderr(0,slength.hsecond{blk},colors.all{1,1}) %% these need to be trimmed to shortest ###
 plot_with_stderr(0,slength.lsecond{blk},colors.all{2,1})
-xlim([0 200])
+% xlim([0 200])
 %% plot individuals
 blk = 4;
 figure(); subplot(3,2,1); hold on; ylim([-0.5 0.5]);

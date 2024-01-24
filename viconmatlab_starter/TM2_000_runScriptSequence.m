@@ -14,6 +14,10 @@ fprintf('heel strikes validated')
 TM2_04_getvalidatedlearningcurves;
 fprintf('calculated learning curves for step time and steplength')
 
+% for R
+if 0
+    TM2_04R_forRmat
+end
 %%
 if 0                                                                                                                   
 TM2_04_forceandimpulseasymmetry; %generates asym_all
