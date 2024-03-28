@@ -1,4 +1,4 @@
-% Test Series Script
+ % Test Series Script
 clear all
 close all
 %%
@@ -27,10 +27,12 @@ TM2_04_forceandimpulseasymmetry; %generates asym_all
 % braking force, trailing limb angle
 end
 %%
+if 0
 % TM2_05_alignlearningCurves;
 % TM2_05_alignsteptimeCurves;
 TM2_05b_alignsteplengthtimeCurves;
 fprintf('aligned step length and step time curves')
+end
 %%
 if 0
 TM2_05_steplength_steptime_unilateral

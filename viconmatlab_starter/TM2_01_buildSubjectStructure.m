@@ -71,6 +71,7 @@ for subj = 1:subject.n
     subject.leglength(subj) = tm_subj_in.leglength(subjindx);
     subject.lowmass(subj) = tm_subj_in.lowmass(subjindx);
     subject.highmass(subj) = tm_subj_in.highmass(subjindx);
+    subject.age(subj) = tm_subj_in.age(subjindx);
 end
 subject.groupname = {'high first' 'low first' 'control' 'high second' 'low second'};
 subject.group = {'hfirst' 'lfirst' 'control' 'hsecond' 'lsecond'};

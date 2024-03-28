@@ -23,9 +23,9 @@ for blk = 4:6
         [p00,tbl] = anova1(inmat,{'high','low','control'},'off'); % ttest2(hf{1,blk}(:,i),lf{1,blk}(:,i));
         p0(i) = p00;
     end
-    firstasymstderr(:,1) = std(hf{1,blk},[],'omitnan')./size(hf{1,blk},1);
-    firstasymstderr(:,2) = std(lf{1,blk},[],'omitnan')./size(lf{1,blk},1);
-    firstasymstderr(:,3) = std(c{1,blk},[],'omitnan')./size(c{1,blk},1);
+    firstasymstderr(:,1) = std(hf{1,blk},[],'omitnan')./sqrt(size(hf{1,blk},1));
+    firstasymstderr(:,2) = std(lf{1,blk},[],'omitnan')./sqrt(size(lf{1,blk},1));
+    firstasymstderr(:,3) = std(c{1,blk},[],'omitnan')./sqrt(size(c{1,blk},1));
     
     subplot(2,3,blk-3); hold on; ylim([ylow,yhigh]);
     colr = nan(4,2,3);
@@ -75,8 +75,8 @@ for blk = 4:6
         p0(i) = p00;
     end
 
-    secondasymstderr(:,1) = std(hs{1,blk},[],'omitnan')./size(hs{1,blk},1);
-    secondasymstderr(:,2) = std(ls{1,blk},[],'omitnan')./size(ls{1,blk},1);
+    secondasymstderr(:,1) = std(hs{1,blk},[],'omitnan')./sqrt(size(hs{1,blk},1));
+    secondasymstderr(:,2) = std(ls{1,blk},[],'omitnan')./sqrt(size(ls{1,blk},1));
 
     subplot(2,3,blk); hold on; ylim([ylow,yhigh]);
     colr = nan(4,2,3);

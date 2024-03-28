@@ -154,3 +154,15 @@ subplot(313); title('control'); hold on;
 plot(slength.control{blk}')
 legend(subject.sorted.control);
 ylim([-1 0.4])
+%%
+figure(2024); hold on; blk = 6;
+ylabel('asymmetry'); xlabel('strides'); title('Learning (1st visit)')
+% ylim([-0.6 0.0])
+plot_with_stderr(0,slength.hfirst{blk},colors.all{1,1}) %% these need to be trimmed to shortest ###
+plot_with_stderr(0,slength.lfirst{blk},colors.all{2,1})
+plot_with_stderr(0,slength.control{blk},colors.all{3,1})
+% xlim([0 200])
+blk = 4;
+plot_with_stderr_linetype(0,slength.hfirst{blk},colors.all{1,1},':') %% these need to be trimmed to shortest ###
+plot_with_stderr_linetype(0,slength.lfirst{blk},colors.all{2,1},':')
+plot_with_stderr_linetype(0,slength.control{blk},colors.all{3,1},':')

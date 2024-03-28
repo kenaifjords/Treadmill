@@ -3,13 +3,13 @@
 tic
 global F p subject colors asym asym_all
 homepath = pwd;
-ifplot = 0; ifboot = 0;
+ifplot = 1; ifboot = 0;
 singleexp.param = [];
 singleexp.CI = [];
 singleexp.aic = [];
 cd("fitExp_knkTools" );
 
-for fitstyle = 1:2
+for fitstyle = 1%:2
 for fitgrp = 1:5
     subjgrp = eval(['subject.' subject.group{fitgrp}]);
     subjcond = subject.grpcond(fitgrp);
@@ -17,7 +17,7 @@ for fitgrp = 1:5
     for subj = subjgrp
         subj
         for effcond = subjcond
-            for blk = 4
+            for blk = [4,6]%:6
                 if fitstyle == 1
                     asymsla = asym(subj).steplength{effcond,blk};%(1:200);
                 else
@@ -39,17 +39,18 @@ for fitgrp = 1:5
 %                     singleexp.aic(i,fitgrp) = aic;
 %                 end
                 %% using nlinfit
+                clear param
                 nlmodel = @(b,stride)b(1) * exp(-b(2)*stride) + b(3);
-                b0 = [0.4, 0.025, -0.025];
+                b0 = [-0.4, 0.025, -0.025];
                 try
                     [param,R,J,cobB,mse,errmod] = nlinfit(stride,asymsla,nlmodel,b0);
                 catch
                     try
-                        b0 = [0.4, 0.01, -0.025];
+                        b0 = [-0.4, 0.01, -0.025];
                         [param,R,J,cobB,mse,errmod] = nlinfit(stride,asymsla,nlmodel,b0);
                     catch
                         try
-                            b0 = [0.4 0.07, -0.025];
+                            b0 = [-0.4 0.05, -0.025];
                             [param,R,J,cobB,mse,errmod] = nlinfit(stride,asymsla,nlmodel,b0);
                         catch
                             param = [];
@@ -59,13 +60,18 @@ for fitgrp = 1:5
                 end
                     
                 if ~isempty(param)
-                    singleexp.param(i,fitgrp,:) = param;
-                    singleexp.mse(i,fitgrp) = mse;
+                    singleexp.param(i,fitgrp,blk,:) = param;
+                    singleexp.mse(i,fitgrp,blk) = mse;
 %                     singleexp.CI(i,fitgrp,:,:) = CI;
 %                     singleexp.aic(i,fitgrp) = aic;
                     if ifplot
                         plot(stride,asymsla); hold on;
                         plot(stride,param(1) * exp(-param(2)*stride) + param(3));
+                        if blk == 4
+                            text(100,-0.2,num2str(param(2)))
+                        elseif blk == 6
+                            text(100,-0.3,num2str(param(2)),'Color','r')
+                        end
                     end
                 elseif ifplot
                     plot(stride,asymsla,'g');
@@ -73,25 +79,49 @@ for fitgrp = 1:5
                 
                 
                 %%
-                i = i + 1;
+                
             end
+            i = i + 1;
         end
         subji = subji + 1;
     end
 end
 cd(homepath)
 %% learning rate bar plot from single exponential fit
-figure(100+fitstyle); hold on;
-learnrate = singleexp.param(:,:,2);
+blk = 4;
+figure(100+fitstyle + blk); hold on;
+learnrate = singleexp.param(:,:,blk,2);
 learnrate(learnrate == 0) = NaN;
 getBarPlot_groupsorted(learnrate,'single exp fit: learning rate',[0 0.5])
-
+title(['learning rate; blk: ' num2str(blk)])
+%%
 figure(120+fitstyle); hold on;
-learnrate = singleexp.param(:,:,2);
+blk = 4;
+coef = singleexp.param(:,:,blk,1);
+learnrate = singleexp.param(:,:,blk,2);
+const = singleexp.param(:,:,blk,3);
+
 learnrate(learnrate == 0) = NaN; learnrate(:,4:5)= NaN;
+coef(coef == 0) = NaN; coef(:,4:5) = NaN;
+const(const == 0) = NaN; const(:,4:5) = NaN;
+% learning rate
+subplot(311); hold on;
 getBarPlot_groupsorted(learnrate,'single exp fit: learning rate',[0 0.15])
-[plr,tbl] = anova1(learnrate(:,1:3),{'high','low','control'},'on');
+[plr,tbl] = anova1(learnrate(:,1:3),{'high','low','control'},'off');
 [~,p_hl]= ttest2(learnrate(:,1),learnrate(:,2));
+ylabel('learning rate')
+% coefficient
+subplot(312);hold on
+getBarPlot_groupsorted(coef,'single exp fit: learning rate',[-1 0])
+[pcf,tbl] = anova1(coef(:,1:3),{'high','low','control'},'off');
+[~,p_hl1]= ttest2(coef(:,1),coef(:,2));
+ylabel('exp coefficient(delta)')
+% constant
+subplot(313); hold on;
+getBarPlot_groupsorted(const,'single exp fit: learning rate',[-0.2 0.2])
+[pco,tbl] = anova1(const(:,1:3),{'high','low','control'},'off');
+[~,p_hl3]= ttest2(const(:,1),const(:,2));
+ylabel('exp constant (ss)')
 %% Examine Learning Rate Distribution
 figure(150+fitstyle); hold on;
 for grp = 1:3 % for first visit groups only 5
@@ -141,11 +171,41 @@ ciLR = [meanLR'-1.96*stdLR' meanLR'+1.96*stdLR'];
 end
 toc
 end
+
+%% compare fits rates within groups between learning and savings
+if 1
+if 0 % blk == 4
+    se4 = singleexp;
+    lr4 = se4.param(:,:,blk,2);
+elseif blk == 6
+    se6 = singleexp
+    lr6 = se6.param(:,:,blk,2);
+end
+
+for effcond = 1:3
+    for parami = 1:3
+        [~,plr] = ttest(singleexp.param(:,effcond,4,parami),singleexp.param(:,effcond,6,parami));
+        disp(['effort condition: ' num2str(effcond)])
+        disp(['parameter: ' num2str(parami)])
+        disp(['ttest between learn and save: p = ' num2str(plr)]);
+    end
+end
+end
+
+%% compare groups for learning on second visit
+for blk = 4:6
+    for parami = 1:3
+        [~,phl] =  ttest2(singleexp.param(:,4,blk,parami),...
+            singleexp.param(:,5,blk,parami));
+        disp(['blk ' num2str(blk) 'parameter: ' num2str(parami)])
+        disp(['ttest between low and high second visit: p = ' num2str(phl)]);
+    end
+end
 %%
     % generate a selection of learning rate values sampled with replacement
     % for each group        
     % high first
-    nhf = size(slength.hfirst{blk},1);
+% % %     nhf = size(slength.hfirst{blk},1);
 %             for i = 1:nhf
 %                 randsubj = randi(nhf,1,1);
 %                 hfcurve(i,:) = slength.hfirst{blk}(randsubj,:);

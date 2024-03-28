@@ -5,7 +5,7 @@ initialpertstep = 1:5; % 10 steps are included in the computation of intiial per
 earlypertstep = 6:30;
 latepertstep = 31:200;
 endpertstep = 30;
-plot_all = 0%1;
+plot_all = 1;
 includeblk = 4:6;
 
 for subj = 1:subject.n
@@ -34,12 +34,42 @@ for subj = 1:subject.n
         end
     end
 end
+%% check symmetryy in plateau
+[sla] = sortbyEffortVisitorder_02(abar.sla);
+[sta] = sortbyEffortVisitorder_02(abar.sta);
+for blk = 1:size(F(subj).R,2)
+    disp(['block: ' num2str(blk)])
+    % high
+    [~,p] = ttest(sla.hfirst{1,blk}(:,4));
+    disp(['high; ttest against hypothesis that plateau is symmetrical: '...
+        num2str(p)])
+    % low
+    [~,p] = ttest(sla.lfirst{1,blk}(:,4));
+    disp(['low; ttest against hypothesis that plateau is symmetrical: '...
+        num2str(p)])
+    % control
+    [~,p] = ttest(sla.control{1,blk}(:,4));
+    disp(['control; ttest against hypothesis that plateau is symmetrical: '...
+        num2str(p)])
+    % high
+    [~,p] = ttest(sla.hfirst{1,blk}(:,4),sla.hfirst{1,3}(:,4));
+    disp(['high; ttest against baseline: '...
+        num2str(p)])
+    % low
+    [~,p] = ttest(sla.lfirst{1,blk}(:,4),sla.lfirst{1,3}(:,4));
+    disp(['low; ttest against baseline: '...
+        num2str(p)])
+    % control
+    [~,p] = ttest(sla.control{1,blk}(:,4),sla.control{1,3}(:,4));
+    disp(['control; ttest against baseline: '...
+        num2str(p)])
+end
 %% FIGURES
 if plot_all
     % braking
     % [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.sla);
-    [sla] = sortbyEffortVisitorder_02(abar.sla);
-    [sta] = sortbyEffortVisitorder_02(abar.sta);
+%     [sla] = sortbyEffortVisitorder_02(abar.sla);
+%     [sta] = sortbyEffortVisitorder_02(abar.sta);
     % this plotting function does not yet handle the control group
     % figure();
     % getBarPlot_asymmetry(hf,lf,hs,ls,'step length asymmetry')
@@ -48,12 +78,13 @@ if plot_all
         sla.lsecond,sla.control,'step length asymmetry',[-0.6 0.2])
     getBarPlot_asymmetry_andcontrol_individual_fig(sla.hfirst,sla.lfirst,sla.hsecond,...
         sla.lsecond,sla.control,'step length asymmetry',[-0.6 0.2])
-    % pushing
-    [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.sta);
-    figure();
-    getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'step time asymmetry',[-0.1 0.5])
-    getBarPlot_asymmetry_andcontrol_individual_fig(sta.hfirst,sta.lfirst,sta.hsecond,...
-        sta.lsecond,sta.control,'step time asymmetry',[-0.1 0.4])
+    
+%     % step tiime
+%     [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.sta);
+%     figure();
+%     getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'step time asymmetry',[-0.1 0.5])
+%     getBarPlot_asymmetry_andcontrol_individual_fig(sta.hfirst,sta.lfirst,sta.hsecond,...
+%         sta.lsecond,sta.control,'step time asymmetry',[-0.1 0.4])
 end
 %%
 % % two way anova over blk (4 - 6) and effort condition
