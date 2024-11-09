@@ -1,7 +1,7 @@
 function [asymsorted] = sortbyEffortVisitorder_digitout(dataallsubj)
 global subject
 %% sort into effort condition and visit order
-acount = 1; bcount = 1; ccount = 1;
+acount = 1; a2count = 1; bcount = 1; b2count = 1; ccount = 1;
 for subj = 1:subject.n
     if subject.order(subj,1) == 1 % [1 2] % high effort first
         for blk = 1:subject.nblk
@@ -10,10 +10,11 @@ for subj = 1:subject.n
             end
             if subject.order(subj,2) == 2
                 for effcond = 2
-                    lsecond{blk}(acount) = dataallsubj(subj,effcond,blk);
+                    lsecond{blk}(a2count) = dataallsubj(subj,effcond,blk);
                 end
-            else
-                lsecond{blk}(acount) = NaN;
+                if blk == subject.nblk
+                    a2count = a2count + 1;
+                end
             end
         end
         acount = acount + 1;
@@ -21,10 +22,11 @@ for subj = 1:subject.n
         for blk = 1:subject.nblk
             if subject.order(subj,2) == 1
                 for effcond = 1
-                    hsecond{blk}(bcount,:) = dataallsubj(subj,effcond,blk);
+                    hsecond{blk}(b2count) = dataallsubj(subj,effcond,blk);
                 end
-            else
-                hsecond{blk}(bcount) = NaN;
+                if blk == subject.nblk
+                    b2count = b2count + 1;
+                end
             end
             for effcond = 2
                 lfirst{blk}(bcount) = dataallsubj(subj,effcond,blk);

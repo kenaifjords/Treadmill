@@ -4,26 +4,37 @@ clearvars -except singleexpfit doubleexpfit fwn_f mft_f
 homepath = pwd;
 global subject
 % make subject data
-subject.list = {'MAC' 'BAN' 'MLL' 'FUM' 'QPQ'...
+subject.list = {'MAC' 'BAN' 'MLL' 'FUM' 'QPQ' ...
                 'BAB' 'CFL' 'COM'...
                 'HZO' 'MLU' 'BEO' 'DCU' 'HKS'...
                 'NVN' 'EHC' 'FWN' 'MFT'...
-                'BVL' 'MYP' 'DXI' 'MGC'...
+                'BVL' 'MYP' 'DXI' 'MGC' 'WSN'...
                 'QQX' 'DVN' 'DOT' 'CND' 'KKC'...
                 'TWD' 'UKW' 'CBO' 'EPN' 'MKT'...
-                'QKQ' 'TKH' 'ECC' 'LYT'...
-                'CMT' 'BCT' 'DHB' 'BKJ'...
-                'IGK'...
-                'EFT' 'LKT' 'QWE' 'IQM' 'KJC'}; % something questionable about data, may remove
-                %% removed to check results stability
+                'QKQ' 'TKH' 'ECC' 'LYT' ...
+                'CMT' 'BCT' 'DHB' 'BKJ' 'DGI'...
+                'IGK' 'FBD' 'DAI' 'EVP' ...
+                'UEN' 'TIG' 'SOH' 'RXH' 'HLG' ...
+                'JIF' 'BWN' 'HST' 'KZN' 'WDB' ...
+                'KIQ' 'ZYN' 'NUI' 'BVC' ...
+                'EFT' 'LKT' 'IQM' 'KJC'};
+                
+                % something questionable about data, may remove
+                % QWE (handrails) TOB (not following instructions - music +
+                % youtube) BAX (left force plate data is corrupted)
+                
+                % removed to check results stability
                 % 'EFT' 'LKT' 'QWE' 'IQM' 'KJC'
-                %%
                 %'ECC' F file does not exist ?}; %
-%                 DXI has fastleg left on visit 1 and right on visit 2
+                % DXI has fastleg left on visit 1 and right on visit 2,
+                % only included first visit
                 % 'BAX' (effcond 1 blks 4,5 have changing force plate 0)
                 % 'WSN' visual outlier 
                 % 'LKT' visual outlier (high first)
                 % 'KJC' visual outlier (low first)
+                % 'TOB' instructions ignired...
+                % 'QWE' relied heavily on the handrails
+                
 subject.n = length(subject.list);
 
 % easing up the loops and labeling
@@ -72,7 +83,25 @@ for subj = 1:subject.n
     subject.lowmass(subj) = tm_subj_in.lowmass(subjindx);
     subject.highmass(subj) = tm_subj_in.highmass(subjindx);
     subject.age(subj) = tm_subj_in.age(subjindx);
+    subject.feetonly(subj) = tm_subj_in.feetonly(subjindx);
+    
+    if subject.order(subj,2) == 0
+        subject.twovisit(subj) = 0;
+        subject.twovisitgroup(subj) = subject.order(subj,1);
+        if subject.twovisitgroup(subj) == 0
+            subject.twovisitgroup(subj) = 3;
+        end
+    else
+        subject.twovisit(subj) = 1;
+        if subject.order(subj,2) == 2
+            subject.twovisitgroup(subj) = 4;
+        else
+            subject.twovisitgroup(subj) = 5;
+        end
+    end
+    
 end
+
 subject.groupname = {'high first' 'low first' 'control' 'high second' 'low second'};
 subject.group = {'hfirst' 'lfirst' 'control' 'hsecond' 'lsecond'};
 
@@ -85,16 +114,20 @@ subject.grpcond = [1 2 3 1 2];
 % subject.fastleg = [2; 1; 2; 1; 2; 2;]; %[2 1; 1 1; 2 2; 1 1; 2 2]; (SWITch from 2 to 1 colum
 
 [subject.sorted] = sortsubjlist(subject.list);
-
+subject.ncond = [length(subject.hfirst) length(subject.lfirst) length(subject.control) length(subject.hsecond) length(subject.lsecond)];
 %% plot appearance details
 colors.high = [248,118,102]/255; % coral-ly orange
+colors.hfirst = colors.high;
 colors.low = [75,143,140]/255; %teal-y
-colors.high_light = cat(2,[248,118,102]/255,0.3); % coral-ly orange
-colors.low_light = cat(2,[75,143,140]/255,0.4); %teal-y
+colors.lfirst = colors.low;
+colors.high_light = [247,150,139]/255; % coral-ly orange
+colors.low_light = [123,181,178]/255; %teal-y
 colors.high2 = [213 94 50]/255; %[255,76,52]/255; % burnt orange
+colors.hsecond = colors.high2;
 colors.low2 = [78,130,109]/255; % [0 158 95]/255; %[49, 156, 189]/255;  % emerald
-colors.control = [166, 178, 200]/255; % [112,128,144]/255;
-colors.control_light = cat(2,[112,128,144]/255,0.3);
+colors.lsecond = colors.low2;
+colors.control = [57,87,117]/255;%[166, 178, 200]/255; % [112,128,144]/255;
+colors.control_light = [93,119,145]/255; %cat(2,[112,128,144]/255,0.3);
 colors.control2 = [96,88,144]/255;
 colors.all{1,1} = colors.high; colors.all{1,2} = colors.high_light; colors.all{1,3} = colors.high2;
 colors.all{2,1} = colors.low; colors.all{2,2} = colors.low_light; colors.all{2,3} = colors.low2;
@@ -113,8 +146,18 @@ for subj = 1:subject.n
     a = load(file_force);
 %     a.f.R{3,4}(1:20)
     b = load(file_marker);
-    F(subj) = a.f;
-    p(subj) = b.pp;
+     F(subj) = a.f;
+    if subject.feetonly(subj) == 1
+        p(subj).trajtime = b.pp.trajtime;
+        p(subj).Rheel = b.pp.Rheel;
+        p(subj).Lheel = b.pp.Lheel;
+        p(subj).Rtoe = b.pp.Rtoe;
+        p(subj).Ltoe = b.pp.Ltoe;
+        p(subj).Rankle = b.pp.Rankle;
+        p(subj).Lankle = b.pp.Lankle;
+    else
+        p(subj) = b.pp;
+    end
     
     cd('C:\Users\rache\OneDrive\Documents\GitHub\Treadmill\viconmatlab_starter\matData_IKID')
     if isfile(file_ik)

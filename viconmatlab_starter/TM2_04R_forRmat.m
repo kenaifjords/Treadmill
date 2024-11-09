@@ -4,12 +4,17 @@ global F asym
 i = 1;
 colnames = {'subj' 'effortcondition' 'stepnumber' 'slasym' 'leglength' ...
     'mass' 'addedmass' 'stasym' 'maxstepnumber' 'exposure' 'height'...
-    'fastleg'};
+    'fastleg', 'exposeinday','twovisitsubject'};
 for subj = 1:subject.n
     % learning
     effcond = subject.order(subj,1); % first visit only for now
     if effcond == 0 
         effcond = 3;
+    end
+    if subject.order(subj,2) ~= 0 
+        twovisitsubj = 1;
+    else
+        twovisitsubj = 0;
     end
     for blk = [4,6] % LEARNING first visit
         clear slasym stasym
@@ -50,6 +55,14 @@ for subj = 1:subject.n
             Rmat(i,11) = subject.height(subj);
             % fastleg
             Rmat(i,12) = subject.fastleg(subj);
+            % exposure number in a day
+            if blk == 4
+                Rmat(i,13) = 1;
+            else
+                Rmat(i,13) = 2;
+            end
+            % does the subject visit twice
+            Rmat(i,14) = twovisitsubj;
             % increment
             i = i + 1;
         end
@@ -98,6 +111,14 @@ for subj = 1:subject.n
                 Rmat(i,11) = subject.height(subj);
                 % fastleg
                 Rmat(i,12) = subject.fastleg(subj);
+                % exposure number in a day
+                if blk == 4
+                    Rmat(i,13) = 1;
+                else
+                    Rmat(i,13) = 2;
+                end
+                % does the subject visit twice
+                Rmat(i,14) = twovisitsubj;
                 % increment
                 i = i + 1;
             end
@@ -105,7 +126,7 @@ for subj = 1:subject.n
     end
 end
 labeled_Rmat = array2table(Rmat,'VariableNames', colnames);
-writetable(labeled_Rmat,'Rmat_v3.csv')
+writetable(labeled_Rmat,'Rmat_v4.csv')
 fprintf('mat made')
             
     

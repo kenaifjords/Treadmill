@@ -15,15 +15,17 @@ for blk = 4:6
     % pert on first exposure (1,) and the two effort levels
     firstasymbar(:,2) = mean(lf{1,blk},'omitnan');
     firstasymbar(:,3) = mean(c{1,blk},'omitnan');
-    for i = 1:4
+    for i = 1:size(hf{1,blk},2)
         ll = max([size(hf{1,blk}(:,i),1),size(lf{1,blk}(:,i),1),size(c{1,blk}(:,i),1)]);
         inmat = nan(ll,3);
         inmat(1:size(hf{1,blk}(:,i),1),1) = hf{1,blk}(:,i);
         inmat(1:size(lf{1,blk}(:,i),1),2) = lf{1,blk}(:,i);
         inmat(1:size(c{1,blk}(:,i),1),3) = c{1,blk}(:,i);
-        [p00,tbl] = anova1(inmat,{'high','low','control'},'off'); 
+        [p00,~] = anova1(inmat,{'high','low','control'},'off'); 
         [~,pt00] = ttest2(hf{1,blk}(:,i),lf{1,blk}(:,i));
         p0(i) = p00; pt0(i) = pt00;
+        [~,pt1(i)] = ttest2(hf{1,blk}(:,i),c{1,blk}(:,i));
+        [~,pt2(i)] = ttest2(lf{1,blk}(:,i),c{1,blk}(:,i));
     end
     firstasymstderr(:,1) = std(hf{1,blk},[],'omitnan')./sqrt(size(hf{1,blk},1));
     firstasymstderr(:,2) = std(lf{1,blk},[],'omitnan')./sqrt(size(lf{1,blk},1));
@@ -41,19 +43,27 @@ for blk = 4:6
     edgcolr(3,1,:) = [colors.high]; edgcolr(3,2,:) = [colors.low]; edgcolr(3,3,:) = [colors.control];
     edgcolr(4,1,:) = [colors.high]; edgcolr(4,2,:) = [colors.low]; edgcolr(4,3,:) = [colors.control];
 
-    X = superbar(1:4, firstasymbar,'E',firstasymstderr,'BarFaceColor', colr,...
+    X = superbar(1:size(hf{1,blk},2), firstasymbar,'E',firstasymstderr,'BarFaceColor', colr,...
         'BarEdgeColor',edgcolr,'BarRelativeGroupWidth',1,'ErrorbarStyle','|');
 %     set(gca, 'XAxisLocation', 'top')
     xticks(1:4)
-    xticklabels({['initial; p = ' num2str(p0(1))] ,...
-        ['early; p = ' num2str(p0(2))],...
-        ['late; p = ' num2str(p0(3))],...
-        ['plateau; p = ' num2str(p0(4))]})
-    text(1:4,[0.05 0.05 0.05 0.05],{['initial; p = ' num2str(pt0(1))] ,...
-        ['early; p = ' num2str(pt0(2))],...
-        ['late; p = ' num2str(pt0(3))],...
-        ['plateau; p = ' num2str(pt0(4))]})
-    title(['asymmetry in blk: ' num2str(blk)])
+    xticklabels({['anova initial; p = ' num2str(p0(1))] ,...
+        ['anova early; p = ' num2str(p0(2))],...
+        ['anova late; p = ' num2str(p0(3))],...
+        ['anova plateau; p = ' num2str(p0(4))]})
+    text(1:4,[0.1 0.1 0.1 0.1],{['HL initial; p = ' num2str(pt0(1))] ,...
+        ['HL early; p = ' num2str(pt0(2))],...
+        ['HL late; p = ' num2str(pt0(3))],...
+        ['HL plateau; p = ' num2str(pt0(4))]})
+    text(1:4,[0.075 0.075 0.075 0.075],{['HC initial; p = ' num2str(pt1(1))] ,...
+        ['HC early; p = ' num2str(pt1(2))],...
+        ['HC late; p = ' num2str(pt1(3))],...
+        ['HC plateau; p = ' num2str(pt1(4))]},'Color','r');
+    text(1:4,[0.05 0.05 0.05 0.05],{['LC initial; p = ' num2str(pt2(1))] ,...
+        ['LC early; p = ' num2str(pt2(2))],...
+        ['LC late; p = ' num2str(pt2(3))],...
+        ['LC plateau; p = ' num2str(pt2(4))]},'Color','b');
+    title([titlein ' in blk: ' num2str(blk)])
     for jj = 1: size(hf{blk},1)
         for kk = 1:4
             plot(X(kk,1)-indivoffset,hf{blk}(jj,kk),'k.')
@@ -80,7 +90,7 @@ for blk = 4:6
         [~,p00] = ttest2(hs{1,blk}(:,i),ls{1,blk}(:,i));
         p0(i) = p00;
     end
-
+%% second visit 
     secondasymstderr(:,1) = std(hs{1,blk},[],'omitnan')./sqrt(size(hs{1,blk},1));
     secondasymstderr(:,2) = std(ls{1,blk},[],'omitnan')./sqrt(size(ls{1,blk},1));
 
@@ -97,7 +107,7 @@ for blk = 4:6
     edgcolr(4,1,:) = [colors.low]; edgcolr(4,2,:) = [colors.high];
 
     X = superbar(1:4, secondasymbar,'E',secondasymstderr,'BarFaceColor', colr,...
-        'BarEdgeColor',edgcolr,'ErrorbarStyle','|')
+        'BarEdgeColor',edgcolr,'ErrorbarStyle','|');
 %     set(gca, 'XAxisLocation', 'top')
 %     ylabel('steplength asymetry');
     xticks(1:4)
@@ -116,7 +126,7 @@ for blk = 4:6
             plot(X(kk,2)-indivoffset,ls{blk}(jj,kk),'k.')
         end
     end
-    title(['asymmetry in blk: ' num2str(blk)])
+    title([titlein ' in blk: ' num2str(blk)])
     
     beautifyfig
 end

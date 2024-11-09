@@ -39,7 +39,7 @@ for subj = 1:subject.n
 end
 size(y)
 %     anovan(y,{b,ef})
-[p,t,stat,term] = anovan(y,{ef,phase,subjL},'random',3,'varnames',{'effort condition','walking task phase','subject'} )
+[p,t,stat,term] = anovan(y,{ef,phase,subjL},'random',3,'varnames',{'effort condition','walking task phase','subject'} );
 
 pout = p;
 end

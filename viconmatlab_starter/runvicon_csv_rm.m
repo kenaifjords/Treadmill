@@ -129,16 +129,19 @@ title('Z forces')
 
 %% Marker data
 trajdataonly = trajdata;
-vicon_stick_1
+% vicon_stick_1
 
 %%
-figure
+figure; subplot(212); hold on;
 plot(trajtime,pRankle(:,2))
 hold on
 plot(trajtime,pLankle(:,2),'g')
-title('Ankle Marker')
+sgtitle('Ankle Marker')
 xlabel('Position (Y) (mm)')
 ylabel('Time (s)')
+subplot(211); hold on;
+plot(trajtime,pRankle(:,1))
+plot(trajtime,pLankle(:,1),'g')
 
 %% Identify heelstrike
 time=resample(timeold,1,10);

@@ -3,7 +3,7 @@
 close all 
 clear all 
 
-animateyes=1;
+animateyes=0;
 %% Read in vicon data from CSV file
 
 readviconcsv_1

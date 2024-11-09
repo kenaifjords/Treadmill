@@ -3,7 +3,7 @@
 close all 
 clear all 
 
-animateyes=1;
+animateyes=0;
 %% Read in vicon data from CSV file
 
 readviconcsv
@@ -104,24 +104,29 @@ end
 %% Plot
 
 figure
-% subplot(311)
-% plot(F1(:,1),'g')
-% hold on
-% plot(F2(:,1),'r')
-% title('X forces')
-% 
-% subplot(312)
-% plot(F1(:,2))
-% hold on
-% plot(F2(:,2),'r')
-% title('Y forces')
+subplot(311)
+plot(F1(:,1),'g')
+hold on
+plot(F2(:,1),'r')
+title('X forces')
+xlim([3.5*10^4, 4.5*10^4])
+
+subplot(312)
+plot(F1(:,2),'g')
+hold on
+plot(F2(:,2),'r')
+title('Y forces')
+xlim([3.5*10^4, 4.5*10^4])
+
 
 subplot(313)
-plot(F1(:,3))
+plot(F1(:,3),'g')
 hold on
 plot(F2(:,3),'r')
 title('Z forces')
+xlim([3.5*10^4, 4.5*10^4])
 
+beautifyfig
 
 
 %% Marker data

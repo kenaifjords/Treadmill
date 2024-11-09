@@ -14,7 +14,7 @@ for blk = 4:6
     % pert on first exposure (1,) and the two effort levels
     firstasymbar(:,2) = mean(lf{1,blk},'omitnan');
     firstasymbar(:,3) = mean(c{1,blk},'omitnan');
-    for i = 1:4
+    for i = 1:size(hf{1,blk},2)
         ll = max([size(hf{1,blk}(:,i),1),size(lf{1,blk}(:,i),1),size(c{1,blk}(:,i),1)]);
         inmat = nan(ll,3);
         inmat(1:size(hf{1,blk}(:,i),1),1) = hf{1,blk}(:,i);
@@ -39,7 +39,7 @@ for blk = 4:6
     edgcolr(3,1,:) = [colors.high]; edgcolr(3,2,:) = [colors.low]; edgcolr(3,3,:) = [colors.control];
     edgcolr(4,1,:) = [colors.high]; edgcolr(4,2,:) = [colors.low]; edgcolr(4,3,:) = [colors.control];
 
-    X = superbar(1:4, firstasymbar,'E',firstasymstderr,'BarFaceColor', colr,...
+    X = superbar(1:size(hf{1,blk},2), firstasymbar,'E',firstasymstderr,'BarFaceColor', colr,...
         'BarEdgeColor',edgcolr,'BarRelativeGroupWidth',1,'ErrorbarStyle','|');
 %     set(gca, 'XAxisLocation', 'top')
     xticks(1:4)

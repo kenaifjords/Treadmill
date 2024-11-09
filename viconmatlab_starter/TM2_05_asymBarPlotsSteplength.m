@@ -1,6 +1,7 @@
 % TM2_05_asymBarPlotsForces
 % this code is dependent on TM2_04_forceandimpulseasymmetry
 global asym asym_all colors
+close all
 initialpertstep = 1:5; % 10 steps are included in the computation of intiial perturbation
 earlypertstep = 6:30;
 latepertstep = 31:200;
@@ -10,16 +11,14 @@ includeblk = 4:6;
 
 for subj = 1:subject.n
     for effcond = 1:size(F(subj).R,1)
-        effcond
         for blk = 1:size(F(subj).R,2) % subject.nblk % includeblk %1:subject.nblk
-            blk
             if isempty(F(subj).R{effcond,blk})
             else
                 % y force
     %             trimasym = min(asym_all.asymlengthy(:,effcond,blk));
                 sla = asym(subj).steplength{effcond,blk};
                 sta = asym(subj).steptime{effcond,blk};
-
+                swa = asym(subj).stepwidth{effcond,blk};
                 % bar plot for step length asymmetry
                 [a, b, c, d] = getBarPlotAsymmetryData(sla);
                 abar.sla{effcond,blk}(subj,1) = a; abar.sla{effcond,blk}(subj,2) = b;
@@ -30,6 +29,11 @@ for subj = 1:subject.n
                 abar.sta{effcond,blk}(subj,1) = a; abar.sta{effcond,blk}(subj,2) = b;
                 abar.sta{effcond,blk}(subj,3) = c; abar.sta{effcond,blk}(subj,4) = d; 
                 abar.sta{effcond,blk}(abar.sta{effcond,blk} == 0) = NaN;
+                % bar plot for step time asymmetry
+                [a, b, c, d] = getBarPlotAsymmetryData(swa);
+                abar.swa{effcond,blk}(subj,1) = a; abar.swa{effcond,blk}(subj,2) = b;
+                abar.swa{effcond,blk}(subj,3) = c; abar.swa{effcond,blk}(subj,4) = d; 
+                abar.swa{effcond,blk}(abar.swa{effcond,blk} == 0) = NaN;
             end
         end
     end
@@ -37,317 +41,147 @@ end
 %% check symmetryy in plateau
 [sla] = sortbyEffortVisitorder_02(abar.sla);
 [sta] = sortbyEffortVisitorder_02(abar.sta);
+[swa] = sortbyEffortVisitorder_02(abar.swa);
+
 for blk = 1:size(F(subj).R,2)
-    disp(['block: ' num2str(blk)])
+    disp(' ');
+    disp(['BLOCK: ' num2str(blk)])
+    
     % high
+    disp(['high plateau asym: ' num2str(mean(sla.hfirst{1,blk}(:,4))) ' +/-'...
+        num2str(std(sla.hfirst{1,blk}(:,4))./size(sla.hfirst{1,blk},1))])
     [~,p] = ttest(sla.hfirst{1,blk}(:,4));
     disp(['high; ttest against hypothesis that plateau is symmetrical: '...
         num2str(p)])
+    disp(' ');
+    
     % low
+    disp(['low plateau asym: ' num2str(nanmean(sla.lfirst{1,blk}(:,4))) ' +/-'...
+        num2str(nanstd(sla.lfirst{1,blk}(:,4))./size(sla.lfirst{1,blk},1))])
     [~,p] = ttest(sla.lfirst{1,blk}(:,4));
     disp(['low; ttest against hypothesis that plateau is symmetrical: '...
         num2str(p)])
+    disp(' ');
+    
     % control
+    disp(['control plateau asym: ' num2str(nanmean(sla.control{1,blk}(:,4))) ' +/-'...
+        num2str(nanstd(sla.control{1,blk}(:,4))./size(sla.control{1,blk},1))])
     [~,p] = ttest(sla.control{1,blk}(:,4));
     disp(['control; ttest against hypothesis that plateau is symmetrical: '...
         num2str(p)])
+    disp(' ');
+    
     % high
     [~,p] = ttest(sla.hfirst{1,blk}(:,4),sla.hfirst{1,3}(:,4));
     disp(['high; ttest against baseline: '...
         num2str(p)])
+    
     % low
     [~,p] = ttest(sla.lfirst{1,blk}(:,4),sla.lfirst{1,3}(:,4));
     disp(['low; ttest against baseline: '...
         num2str(p)])
+    
     % control
     [~,p] = ttest(sla.control{1,blk}(:,4),sla.control{1,3}(:,4));
     disp(['control; ttest against baseline: '...
         num2str(p)])
 end
+%% STEPLENGTH pairwise ttests
+disp(' ');
+disp('STEP LENGTH')
+snap_title = {'initial','early','late','plateau'};
+for blk = [4 5 6]
+    disp(['BLK ' num2str(blk)])
+    for snap = 1:4
+        % high v low
+        [~,p] = ttest2(sla.hfirst{1,blk}(:,snap),sla.lfirst{1,blk}(:,snap));
+        disp(['pairwise ttest, high v low: ' snap_title{snap} ': '...
+            num2str(p)]);
+        % high v control
+        [~,p] = ttest2(sla.hfirst{1,blk}(:,snap),sla.control{1,blk}(:,snap));
+        disp(['pairwise ttest, high v control: ' snap_title{snap} ': '...
+            num2str(p)]);
+        % low v control
+        [~,p] = ttest2(sla.lfirst{1,blk}(:,snap),sla.control{1,blk}(:,snap));
+        disp(['pairwise ttest, low v control: ' snap_title{snap} ': '...
+            num2str(p)]);
+    end
+end
+%% STEP TIME pairwise ttests
+disp(' ');
+disp('STEP TIME')
+snap_title = {'initial','early','late','plateau'};
+for blk = [4 6]
+    disp(['BLK ' num2str(blk)])
+    for snap = 1:4
+        % high v low
+        [~,p] = ttest2(sta.hfirst{1,blk}(:,snap),sta.lfirst{1,blk}(:,snap));
+        disp(['pairwise ttest, high v low: ' snap_title{snap} ': '...
+            num2str(p)]);
+        % high v control
+        [~,p] = ttest2(sta.hfirst{1,blk}(:,snap),sta.control{1,blk}(:,snap));
+        disp(['pairwise ttest, high v control: ' snap_title{snap} ': '...
+            num2str(p)]);
+        % low v control
+        [~,p] = ttest2(sta.lfirst{1,blk}(:,snap),sta.control{1,blk}(:,snap));
+        disp(['pairwise ttest, low v control: ' snap_title{snap} ': '...
+            num2str(p)]);
+    end
+end
+
+%% STEP WIDTH pairwise ttests
+disp(' ');
+disp('STEP WIDTH')
+snap_title = {'initial','early','late','plateau'};
+for blk = [4 6]
+    disp(['BLK ' num2str(blk)])
+    for snap = 1:4
+        % high v low
+        [~,p] = ttest2(swa.hfirst{1,blk}(:,snap),swa.lfirst{1,blk}(:,snap));
+        disp(['pairwise ttest, high v low: ' snap_title{snap} ': '...
+            num2str(p)]);
+        % high v control
+        [~,p] = ttest2(swa.hfirst{1,blk}(:,snap),swa.control{1,blk}(:,snap));
+        disp(['pairwise ttest, high v control: ' snap_title{snap} ': '...
+            num2str(p)]);
+        % low v control
+        [~,p] = ttest2(swa.lfirst{1,blk}(:,snap),swa.control{1,blk}(:,snap));
+        disp(['pairwise ttest, low v control: ' snap_title{snap} ': '...
+            num2str(p)]);
+    end
+end
 %% FIGURES
 if plot_all
-    % braking
-    % [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.sla);
-%     [sla] = sortbyEffortVisitorder_02(abar.sla);
-%     [sta] = sortbyEffortVisitorder_02(abar.sta);
-    % this plotting function does not yet handle the control group
-    % figure();
-    % getBarPlot_asymmetry(hf,lf,hs,ls,'step length asymmetry')
     figure();
     getBarPlot_asymmetry_andcontrol(sla.hfirst,sla.lfirst,sla.hsecond,...
         sla.lsecond,sla.control,'step length asymmetry',[-0.6 0.2])
     getBarPlot_asymmetry_andcontrol_individual_fig(sla.hfirst,sla.lfirst,sla.hsecond,...
         sla.lsecond,sla.control,'step length asymmetry',[-0.6 0.2])
     
-%     % step tiime
-%     [hf,lf,hs,ls,c] = sortbyEffortVisitorder(abar.sta);
-%     figure();
-%     getBarPlot_asymmetry_andcontrol(hf,lf,hs,ls,c,'step time asymmetry',[-0.1 0.5])
-%     getBarPlot_asymmetry_andcontrol_individual_fig(sta.hfirst,sta.lfirst,sta.hsecond,...
-%         sta.lsecond,sta.control,'step time asymmetry',[-0.1 0.4])
+    figure();
+    getBarPlot_asymmetry_andcontrol(sta.hfirst,sta.lfirst,sta.hsecond,...
+        sta.lsecond,sta.control,'step time asymmetry',[-0.2 0.6])
+    getBarPlot_asymmetry_andcontrol_individual_fig(sta.hfirst,sta.lfirst,sta.hsecond,...
+        sta.lsecond,sta.control,'step time asymmetry',[-0.2 0.6])
+    
+    figure();
+    getBarPlot_asymmetry_andcontrol_individual_fig(swa.hfirst,swa.lfirst,swa.hsecond,...
+        swa.lsecond,swa.control,'step width asymmetry',[-0.6 0.6])
 end
-%%
-% % two way anova over blk (4 - 6) and effort condition
-% % size(p,2) = initial, early, late, final
-% [p_2wbinned] = get2wayANOVA(abar.sla)
-
-% % one way anova between effort conditions 
-% % for blk 4-6 (rows) at initial, early, late, final
-% [p_1wbinned] = get1wayANOVA(abar.sla)
-%%
-% two way repeated measures
+%% two way repeated measures
 [p_2wRR] = get2wayRepeatedMeasuresANOVA(abar.sla);
+[p_2wRR_sw] = get2wayRepeatedMeasuresANOVA(abar.swa);
 %%
 
-% % % splitbeltbarplot(blk,brake)
-% brake
-% push
-% impulse
-% heelFz
-% toeFz
-% minstanceFz
-
-function splitbeltbarplot(blk,input)
-%% use superbar CORRECTED first exposure asymmetry
-clear colr edgcolr
-% first exposure asym
-firstasymbar(1,:) = [mean(input.hfirst{blk}(:,initialpertstep),'all') input.lfirst{blk}(:,initialpertstep,'all') input.control(:,initialpertstep,'all')]; % specifies intial
-% pert on first exposure (1,) and the two effort levels
-firstasymbar(2,:) = [mean(input.hfirst{blk}(:,earlypertstep),'all') input.lfirst{blk}(:,earlypertstep,'all') input.control(:,earlypertstep,'all')];
-firstasymbar(3,:) = [mean(input.hfirst{blk}(:,latepertstep),'all') input.lfirst{blk}(:,latepertstep,'all') input.control(:,latepertstep,'all')];
-firstasymbar(4,:) = [mean(input.hfirst{blk}(:,end-endpertstep),'all') input.lfirst{blk}(:,earlypertstep,'all') input.control(:,earlypertstep,'all')]; % specifies intial
-
-firstasymstderr = [stderrinitial(1) stderrinitial(2);...
-    stderrearly(1) stderrearly(2);...
-    stderrlate(1) stderrlate(2);...
-    stderrend(1) stderrend(2)];
-
-figure(); hold on;
-colr = nan(4,2,3);
-colr(1,1,:) = colors.high; colr(1,2,:) = colors.low;
-colr(2,1,:) = colors.high; colr(2,2,:) = colors.low; 
-colr(3,1,:) = colors.high; colr(3,2,:) = colors.low;
-colr(4,1,:) = colors.high; colr(4,2,:) = colors.low;
-edgcolr = nan(4,2,3);
-edgcolr(1,1,:) = [colors.high]; edgcolr(1,2,:) = [colors.low];
-edgcolr(2,1,:) = [colors.high]; edgcolr(2,2,:) = [colors.low];
-edgcolr(3,1,:) = [colors.high]; edgcolr(3,2,:) = [colors.low];
-edgcolr(4,1,:) = [colors.high]; edgcolr(4,2,:) = [colors.low];
-
-superbar(1:4, firstasymbar,'E',firstasymstderr,'BarFaceColor', colr,...
-    'BarEdgeColor',edgcolr,'ErrorbarStyle','|')
-set(gca, 'XAxisLocation', 'top')
-ylabel('steplength asymetry');
-xticks(1:4)
-xticklabels({'initial','early','late','plateau'})
-title('steplength asymmetry in first exposure')
-end
-
-% % align asymmetry by steps and average across subjects to get curves
-% % first sort by all four groups, then combine fastleg different groups (so
-% % that we are comparing low first to high first
-% split1blk = 4;
-% wash1blk = 5;
-% split2blk = 6;
-% 
-% ninitialstep = 40;
-% % create binary vector to identify group high first or low first
-% firsteff = subject.order(:,1);
-% secondeff = subject.order(:,2);
-% firsteff = firsteff(firsteff > 0);
-% secondeff = secondeff(secondeff > 0);
-% 
-% 
-% initialpertstep = 1:5; % 10 steps are included in the computation of intiial perturbation
-% earlypertstep = 6:30;
-% latepertstep = 31:200;
-% endpertstep = 30;
-% 
-% % create cell structure for each block (including all subjects)
-% 
-% % sort by exposures
-% ctrlcount = 1; effcount = 1;
-% for subj = 1:subject.n
-%     for blk = 1:subject.nblk
-%         if subject.order(subj,1) ~= 0 || % high first [0 0]% 1 and 2 here refer to order of visits
-%             learncurves1_cell{effcount,blk} = asym(subj).steplength{firsteff(subj),blk};
-%             learncurves2_cell{effcount,blk} = asym(subj).steplength{secondeff(subj),blk};
-%         else
-%             learncurvesC_cell{ctrlcount,blk} = asym(subj).steplength{3,blk};
-%         end
-%     end
-%     if subject.order(subj) ~= [0 0]
-%         effcount = effcount +1;
-%     else
-%         ctrlcount = ctrlcount +1;
-%     end
-% end
-% ctrlcount = ctrlcount - 1;
-% effcount = effcount -1;
-% % first visit
-% [split1_curves,~] = alignProfiles2(learncurves1_cell(:,split1blk),ones(effcount,1));
-% [wash1_curves,~] = alignProfiles2(learncurves1_cell(:,wash1blk),ones(effcount,1));
-% [split2_curves,~] = alignProfiles2(learncurves1_cell(:,split2blk),ones(effcount,1));
-% % second visit
-% [split3_curves,~] = alignProfiles2(learncurves2_cell(:,split1blk),ones(effcount,1));
-% [wash3_curves,~] = alignProfiles2(learncurves2_cell(:,wash1blk),ones(effcount,1));
-% [split4_curves,~] = alignProfiles2(learncurves2_cell(:,split2blk),ones(effcount,1));
-% % control visit
-% [split1ctrl_curves,~] = alignProfiles2(learncurvesC_cell(:,split1blk),ones(ctrlcount,1));
-% [washctrl_curves,~] = alignProfiles2(learncurvesC_cell(:,wash1blk),ones(ctrlcount,1));
-% [split2ctrl_curves,~] = alignProfiles2(learncurvesC_cell(:,split2blk),ones(ctrlcount,1));
-% 
-% 
-% % trim off the pad NaNs added by the align function
-% split1_curves = split1_curves(:,2:end-1);
-% wash1_curves = wash1_curves(:,2:end-1);
-% split2_curves = split2_curves(:,2:end-1);
-% 
-% split3_curves = split3_curves(:,2:end-1);
-% wash3_curves = wash3_curves(:,2:end-1);
-% split3_curves = split3_curves(:,2:end-1);
-% 
-% % multiply matrix of learning curves by binary vector and remove zeros to 
-% % generate matrices for each group
-% % sort by groups (high first and low first - ignoring fast leg for now)
-% highfirst = double(firsteff < 2); highfirst(highfirst == 0) = NaN;
-% lowfirst = double(firsteff > 1); lowfirst(lowfirst == 0) = NaN;
-% 
-% highsplit1 = split1_curves.*highfirst;
-% lowsplit1 = split1_curves.*lowfirst;
-% highsplit3 = split3_curves.*lowfirst; 
-% lowsplit3 = split3_curves.*highfirst; % split 3 refers to the third exposure
-% % during the second visit to the lab, as such it is in the second
-% % collection, lowfirst implies highsecond
-% 
-% highwash1 = wash1_curves.*highfirst;
-% lowwash1 = wash1_curves.*lowfirst;
-% highwash3 = wash3_curves.*lowfirst; % see above
-% lowwash3 = wash3_curves.*highfirst;
-% 
-% highsplit2 = split2_curves.*highfirst;
-% lowsplit2 = split2_curves.*lowfirst;
-% highsplit4 = split4_curves.*lowfirst; % see above
-% lowsplit4 = split4_curves.*highfirst;
-% 
-% %% BARPLOT for initial perturbation (first 10 strides) for two effort
-% initialpert = [mean(highsplit1(:,initialpertstep),'all','omitnan') mean(lowsplit1(:,initialpertstep),'all','omitnan');...
-%     mean(highsplit2(:,initialpertstep), 'all','omitnan') mean(lowsplit2(:,initialpertstep), 'all','omitnan');...
-%     mean(highsplit3(:,initialpertstep), 'all','omitnan') mean(lowsplit3(:,initialpertstep), 'all','omitnan');...
-%     mean(highsplit4(:,initialpertstep), 'all','omitnan') mean(lowsplit4(:,initialpertstep), 'all','omitnan')];
-% earlypert = [mean(highsplit1(:,earlypertstep),'all','omitnan') mean(lowsplit1(:,earlypertstep),'all','omitnan');...
-%     mean(highsplit2(:,earlypertstep), 'all','omitnan') mean(lowsplit2(:,earlypertstep), 'all','omitnan');...
-%     mean(highsplit3(:,earlypertstep), 'all','omitnan') mean(lowsplit3(:,earlypertstep), 'all','omitnan');...
-%     mean(highsplit4(:,earlypertstep), 'all','omitnan') mean(lowsplit4(:,earlypertstep), 'all','omitnan')];
-% latepert = [mean(highsplit1(:,latepertstep),'all','omitnan') mean(lowsplit1(:,latepertstep),'all','omitnan');...
-%     mean(highsplit2(:,latepertstep), 'all','omitnan') mean(lowsplit2(:,latepertstep), 'all','omitnan');...
-%     mean(highsplit3(:,latepertstep), 'all','omitnan') mean(lowsplit3(:,latepertstep), 'all','omitnan');...
-%     mean(highsplit4(:,latepertstep), 'all','omitnan') mean(lowsplit4(:,latepertstep), 'all','omitnan')];
-% effcount0 = 1; ctrlcount = 1;
-% for subj = 1:subject.n 
-%     if subject.order(subj) ~= [0 0]
-%         lastH1 = find(~isnan(highsplit1(subj,:)),1,'last');
-%         lastL1 = find(~isnan(lowsplit1(subj,:)),1,'last');
-%         lastH2 = find(~isnan(highsplit2(subj,:)),1,'last');
-%         lastL2 = find(~isnan(lowsplit2(subj,:)),1,'last');
-%         lastH3 = find(~isnan(highsplit3(subj,:)),1,'last');
-%         lastL3 = find(~isnan(lowsplit3(subj,:)),1,'last');
-%         lastH4 = find(~isnan(highsplit4(subj,:)),1,'last');
-%         lastL4 = find(~isnan(lowsplit4(subj,:)),1,'last');
-%         endpert0(:,:,effcount0) = [mean(highsplit1(subj, lastH1-endpertstep:lastH1),'all','omitnan') mean(lowsplit1(subj, lastL1-endpertstep:lastL2),'all','omitnan');...
-%             mean(highsplit2(subj, lastH2-endpertstep:lastH2), 'all','omitnan') mean(lowsplit2(subj, lastL2-endpertstep:lastL2), 'all','omitnan');...
-%             mean(highsplit3(subj, lastH3-endpertstep:lastH3), 'all','omitnan') mean(lowsplit3(subj, lastL3-endpertstep:lastL3), 'all','omitnan');...
-%             mean(highsplit4(subj, lastH4-endpertstep:lastH4), 'all','omitnan') mean(lowsplit4(subj, lastL4-endpertstep:lastL4), 'all','omitnan')];
-%         effcount0 = effcount0 + 1;
-%     end
-% end
-% endpert = mean(endpert0,3,'omitnan');
-% % To get standard deviations
-% initialpert_subj = [mean(highsplit1(:,initialpertstep),2,'omitnan'), mean(lowsplit1(:,initialpertstep),2,'omitnan'),...
-%     mean(highsplit2(:,initialpertstep), 2,'omitnan'), mean(lowsplit2(:,initialpertstep), 2,'omitnan'),...
-%     mean(highsplit3(:,initialpertstep), 2,'omitnan'), mean(lowsplit3(:,initialpertstep), 2,'omitnan'),...
-%     mean(highsplit4(:,initialpertstep), 2,'omitnan'), mean(lowsplit4(:,initialpertstep), 2,'omitnan')];
-% earlypert_subj = [mean(highsplit1(:,earlypertstep),2,'omitnan') mean(lowsplit1(:,earlypertstep),2,'omitnan'),...
-%     mean(highsplit2(:,earlypertstep), 2,'omitnan') mean(lowsplit2(:,earlypertstep), 2,'omitnan'),...
-%     mean(highsplit3(:,earlypertstep), 2,'omitnan') mean(lowsplit3(:,earlypertstep), 2,'omitnan'),...
-%     mean(highsplit4(:,earlypertstep), 2,'omitnan') mean(lowsplit4(:,earlypertstep), 2,'omitnan')];
-% latepert_subj = [mean(highsplit1(:,latepertstep),2,'omitnan') mean(lowsplit1(:,latepertstep),2,'omitnan'),...
-%     mean(highsplit2(:,latepertstep), 2,'omitnan') mean(lowsplit2(:,latepertstep), 2,'omitnan'),...
-%     mean(highsplit3(:,latepertstep), 2,'omitnan') mean(lowsplit3(:,latepertstep), 2,'omitnan'),...
-%     mean(highsplit4(:,latepertstep), 2,'omitnan') mean(lowsplit4(:,latepertstep), 2,'omitnan')];
-% 
-% 
-% 
-% stderrinitial = std(initialpert_subj,[],1,'omitnan')./sqrt(sum(~isnan(initialpert_subj),1));
-% stderrearly = std(earlypert_subj,[],1,'omitnan')./sqrt(sum(~isnan(earlypert_subj),1));
-% stderrlate = std(latepert_subj,[],1,'omitnan')./sqrt(sum(~isnan(latepert_subj),1));
-% stderrend0 = std(endpert0,[],3,'omitnan')./sqrt(sum(~isnan(endpert0),3));
-% stderrend = stderrend0(:);
-% %% via barmod
-% % % barmod variables (x,ar,bo,bgo,xlimo,ylimo,labels)
-% % % x will be data
-% % ar = 0.75; % aspect ratio
-% % bo = 0; % bar offset
-% % bgo = 0.2; % bar offset for bar groups
-% % xlimo = bgo; % offset of bar from axes and end of plot
-% % ylimo = bgo;% offset of bar from top / bottom of the chart
-% % labels = ["Exposure 1","Exposure 2", "Exposure 3", "Exposure 4"];
-% % % conditions across the 4 exposures
-% % figure; hold on;
-% % bar_ip = barmod(initialpert,[],ar,bo,bgo,xlimo,ylimo,labels); %bar_ip = bar(initialpert);
-% % %Color Declaration
-% % clrs = cell(1);
-% % for i = 1:size(initialpert,2) %indexed first to call rand's three times, not six
-% %     clrs{i} = colors.all{i,1};
-% %     for j = 1:size(initialpert,1)
-% %         bar_ip(j,i).FaceColor = clrs{i};
-% %     end
-% % end
-% % ylabel('steplength asymmetry (average of first 10 strides)'); xlabel('split belt exposure')
-% 
-% %% use superbar
-% % figure(); hold on;
-% % colr = [colors.high; colors.low];
-% % edgcolr = nan(4,2,3);
-% % edgcolr(1,1,:) = [colors.high]; edgcolr(1,2,:) = [colors.low];
-% % edgcolr(2,1,:) = [colors.high]; edgcolr(2,2,:) = [colors.low];
-% % edgcolr(3,1,:) = [colors.low]; edgcolr(3,2,:) = [colors.high];
-% % edgcolr(4,1,:) = [colors.low]; edgcolr(4,2,:) = [colors.high];
-% % 
-% % superbar(1:4, initialpert,'E',stderrpert,'BarFaceColor', permute(colr,[3 1 2]),...
-% %     'BarEdgeColor',edgcolr,'ErrorbarStyle','|')
-% % set(gca, 'XAxisLocation', 'top')
-% % ylabel('steplength asymetry (first 10 strides)');
-% % xticks(1:4)
-% % xlabel('Split Belt Exposure')
-% %% use superbar CORRECTED initial perturbation at each exposure
-% figure(); hold on;
-% clear colr
-% colr(1,1,:) = colors.high; colr(1,2,:) = colors.low;
-% colr(2,1,:) = colors.high; colr(2,2,:) = colors.low; 
-% colr(3,1,:) = colors.low; colr(3,2,:) = colors.high;
-% colr(4,1,:) = colors.low; colr(4,2,:) = colors.high;
-% edgcolr = nan(4,2,3);
-% edgcolr(1,1,:) = [colors.high]; edgcolr(1,2,:) = [colors.low];
-% edgcolr(2,1,:) = [colors.high]; edgcolr(2,2,:) = [colors.low];
-% edgcolr(3,1,:) = [colors.high]; edgcolr(3,2,:) = [colors.low];
-% edgcolr(4,1,:) = [colors.high]; edgcolr(4,2,:) = [colors.low];
-% 
-% superbar(1:4, initialpert,'E',stderrinitial,'BarFaceColor', colr,...
-%     'BarEdgeColor',edgcolr,'ErrorbarStyle','|')
-% set(gca, 'XAxisLocation', 'top')
-% ylabel('steplength asymetry (first 10 strides)');
-% xticks(1:4)
-% xlabel('Split Belt Exposure')
-% title('Initial Perturbation in each exposure')
+% function splitbeltbarplot(blk,input)
 % %% use superbar CORRECTED first exposure asymmetry
 % clear colr edgcolr
 % % first exposure asym
-% firstasymbar(1,:) = [initialpert(1,1) initialpert(1,2)]; % specifies intial
+% firstasymbar(1,:) = [mean(input.hfirst{blk}(:,initialpertstep),'all') input.lfirst{blk}(:,initialpertstep,'all') input.control(:,initialpertstep,'all')]; % specifies intial
 % % pert on first exposure (1,) and the two effort levels
-% firstasymbar(2,:) = [earlypert(1,1) earlypert(1,2)];
-% firstasymbar(3,:) = [latepert(1,1) latepert(1,2)];
-% firstasymbar(4,:) = [endpert(1,1) endpert(1,2)];
+% firstasymbar(2,:) = [mean(input.hfirst{blk}(:,earlypertstep),'all') input.lfirst{blk}(:,earlypertstep,'all') input.control(:,earlypertstep,'all')];
+% firstasymbar(3,:) = [mean(input.hfirst{blk}(:,latepertstep),'all') input.lfirst{blk}(:,latepertstep,'all') input.control(:,latepertstep,'all')];
+% firstasymbar(4,:) = [mean(input.hfirst{blk}(:,end-endpertstep),'all') input.lfirst{blk}(:,earlypertstep,'all') input.control(:,earlypertstep,'all')]; % specifies intial
 % 
 % firstasymstderr = [stderrinitial(1) stderrinitial(2);...
 %     stderrearly(1) stderrearly(2);...
@@ -373,3 +207,4 @@ end
 % xticks(1:4)
 % xticklabels({'initial','early','late','plateau'})
 % title('steplength asymmetry in first exposure')
+% end
