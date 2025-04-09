@@ -38,8 +38,11 @@ data_expose2to3 <-data_expose2[data_expose2$exposure<4,]
 
 # learning rates (at different exposures)
 sLR = lmer(sla_plateau ~ as.factor(effortcondition) + exposure  + 
-           (0 + exposure|numberofvisits) + (1|as.factor(numberofvisits):subj),
+           (0 + exposure|numberofvisits) + (1 + as.factor(numberofvisits) | subj),
           data = data_rot, REML = FALSE)
+sLR = lmer(sla_plateau ~ as.factor(effortcondition) + 
+             exposure + (1 + numberofvisits|subj),
+           data = data_rot, REML = FALSE)
 
 ################################################################################
 
@@ -52,7 +55,7 @@ summary(sLR1)
 
 sLR3 = hglm2(ss_learnrate ~ norm_added_mass + 
                as.factor(numberofvisits)  * exposure +
-               (1 + exposure | subj), family = binomial(link = "logit"),
+               (1 + numberofvisits | subj), family = binomial(link = "logit"),
              data = data_rot)
 summary(sLR3)
 plot(sLR3)
@@ -60,34 +63,34 @@ plot(sLR3)
 # log link for constrained remembering
 sRF1 = hglm2(ss_remember ~ as.factor(effortcondition) + 
                as.factor(numberofvisits)  * exposure +
-               (1 + exposure | subj), family = binomial(link = "logit"),
+               (1 + numberofvisits | subj), family = binomial(link = "logit"),
              data = data_rot)
 summary(sRF1)
 
 # log transformed learning rate
 sLR2 = lmer(logsslearnrate ~ as.factor(effortcondition) + 
               as.factor(numberofvisits) * exposure + 
-              (1 + exposure | subj),
+              (1 + numberofvisits | subj),
             data = data_rot)
 summary(sLR2)
 
 sLR4 = lmer(logsslearnrate ~ norm_added_mass + 
               as.factor(numberofvisits) * exposure + 
-              (1 + exposure | subj),
+              (1 + numberofvisits | subj),
             data = data_rot)
 summary(sLR4)
 
 # z transformed plateau values (to map to a normal distribution)
 splat1 = lmer(zplat ~ as.factor(effortcondition) + 
               as.factor(numberofvisits)  * exposure +
-              (1 + exposure | subj),
+              (1 + numberofvisits | subj),
             data = data_rot)
 summary(splat1)
 
 # exponential learning rate
 eLR1 = hglm2(exp_learnrate ~ as.factor(effortcondition) +
               as.factor(numberofvisits) * exposure + 
-              (1 + exposure | subj), family = binomial(link = "logit"),
+              (1 + numberofvisits | subj), family = binomial(link = "logit"),
             data = data_rot)
 summary(eLR1)
 plot_model(eLR1,"diag")

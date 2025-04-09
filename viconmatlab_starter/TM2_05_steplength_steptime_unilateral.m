@@ -89,7 +89,7 @@ for subj = 1:subject.n
     end  
 end
 
-if 0
+if 1 %0
 %% unilateral step length
 [fastlength.hfirst,fastlength.lfirst,fastlength.hsecond,fastlength.lsecond,fastlength.control] = ...
     sortbyEffortVisitorder(fast_all.steplength);
@@ -112,6 +112,7 @@ for blk = 2:3
             sl0(subji,grp) = mean(s(end-30:end));
             asl0(subji,grp) = mean(as(end-30:end));
         end
+        
         % last 30 strides
         meansl = nanmean(sl0(:,grp));
         meanasl = nanmean(asl0(:,grp));
@@ -130,8 +131,17 @@ for blk = 2:3
     end
     psl_base = anova1(sl0);
     disp(['ANOVA steplength between groups: ' num2str(psl_base)]);
+    
+    sL(:,:,blk) = sl0;
 end
     
+% compare between blocks
+[~, ph] = ttest(sL(:,1,2),sL(:,1,3));
+[~, pl] = ttest(sL(:,2,2),sL(:,2,3));
+[~, pc] = ttest(sL(:,3,2),sL(:,3,3));
+disp(['between fast and slow baseline H p = ' num2str(ph) ' L p = ' ...
+    num2str(pl) ' C p = ' num2str(pc)])
+
 %% plot unilateral step length
 
 figure(101); hold on;
