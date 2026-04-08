@@ -10,6 +10,8 @@ for subj = 1:subject.n
         end
         for blk = 1:subject.nblk
             if blk > size(F(subj).R,2)
+                asym(subj).steplength{effcond,blk} = []; %NaN;
+                asym(subj).steptime{effcond,blk} =  []; %NaN;
                 break
             end
             % clear and initialize
@@ -110,10 +112,9 @@ for subj = 1:subject.n
                 % save step length and step time asymmetries
                 asym(subj).steplength{effcond,blk} = steplength_asym;
                 asym(subj).steptime{effcond,blk} = steptime_asym;
-                
                 if yes_plot
                     % asymmetry plots to identify spurious heelstrikes....
-                    figure(subj);subplot(3,7,blk); hold on;
+                    figure(subj); subplot(3,7,blk); hold on;
                     plot(F(subj).steplengthR{effcond,blk},'g','Marker',effcondmarker(effcond),'LineStyle','none');
                     plot(F(subj).steplengthL{effcond,blk},'r','Marker',effcondmarker(effcond),'LineStyle','none');                  
                     subplot(3,7,blk + 7); hold on;
@@ -128,6 +129,12 @@ for subj = 1:subject.n
                     end
                     sgtitle(subject.list(subj))
                 end
+            else
+                asym(subj).steplength{effcond,blk} = []; %NaN;
+                asym(subj).steptime{effcond,blk} =  []; %NaN;
+%                 subj
+%                 effcond
+%                 blk
             end
         end
     end

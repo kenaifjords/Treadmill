@@ -2,11 +2,16 @@
 close all
 global F p subject
 endxlim = 2500
-for subj = 14 %10 % 1:subject.n
+for subj = 9 %10 % 1:subject.n
     subject.list(subj)
     mark = ['none' 'none'];
-    for effcond = 1 %1:2 %1:length(subject.effortcondition)
-        for blk =  1:subject.nblk % 1:subject.nblk
+    eff1 = subject.order(subj,1);
+    if eff1 == 0
+        eff1 = 3;
+    end
+    for effcond = eff1%1 %1:2 %1:length(subject.effortcondition)
+        effcond
+        for blk =  3%4 %1:subject.nblk % 1:subject.nblk
             fzr = F(subj).R{effcond,blk}(:,3);
             fzl = F(subj).L{effcond,blk}(:,3);
 %             hsrval = F(subj).hsRvalid{effcond,blk};

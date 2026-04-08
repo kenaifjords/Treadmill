@@ -3,7 +3,6 @@ global subject
 %% sort into effort condition and visit order
 acount = 1; bcount = 1; ccount = 1;
 for subj = 1:subject.n
-    subj
     if subject.order(subj,1) == 1 % [1 2] % high effort first
         for blk = 1:subject.nblk
             effcond = 1;
@@ -15,7 +14,7 @@ for subj = 1:subject.n
                 lsecond{blk}(acount,:) = NaN;
             end
         end
-        acount = acount + 1
+        acount = acount + 1;
     elseif subject.order(subj,1) == 2 %[2 1] % low effort first
         for blk = 1:subject.nblk
             effcond = 2;
@@ -28,6 +27,7 @@ for subj = 1:subject.n
             end
         end
         bcount = bcount + 1;
+        % what is the second requirement here for?
     elseif subject.order(subj,1) == 0 && subj <= size(asym_allsubj{3,blk},1)% control
         for blk = 1:subject.nblk
             control{blk}(ccount,:) = asym_allsubj{3,blk}(subj,:);

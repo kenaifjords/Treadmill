@@ -14,7 +14,7 @@ trim_time_end = 100;
 % take the mat files for each subject and build a full structure, so that
 % we can loop through subjects - PREFER ONE SUBJECT AT A TIME
 %% add subject code here and change effort condition(s) in line 32
-subject.list =  { 'DXI' };
+subject.list =  { 'ZYN' };
 
 % 'MAC' 'BAN' 'MLL' 'FUM' 'QPQ' 
 % 'BAB' 'CFL' 'COM' 'KJC' 'LKT'    
@@ -23,7 +23,10 @@ subject.list =  { 'DXI' };
 % 'BVL' 'IQM' 'MYP' 'DXI' 'MGC'%
 % 'CND' 'DVN' 'DOT' 'QQX' 'ECC'
 % 'LYT' 'CMT' 'BCT' 'QWE' 'DHB'
-% 'BKJ' 'IGK'
+% 'BKJ' 'IGK' 'DXI' 'FBD' 'DAI'
+% 'UEN' 'TIG' 'SOH' 'RXH' 'HLG'
+% 'TOB' 'JIF' 'BWN' 'HST' 'KZN'
+% 'DGI' 'WDB' 'KIQ' 'NUI' 'BVC'
 
 % 'TWD' 'UKW' 'CBO' 'EPN' 'MKT'
 % 'QKQ' 'EFT' 'TKH'
@@ -97,10 +100,10 @@ for subj = 1:length(subject.list)
 %             dataraw=devicedata(trim_timeforce:end-trim_time_endforce,:);
 %             trajdata = trajdata0(trim_time:end-trim_time_end,:);
             
-            if size(dataraw,2) < 30
+            if size(dataraw,2) < 26 %30
 %                 dataraw = cat(2,dataraw,nan(size(dataraw,1), 30 - size(dataraw,2)));
                 disp(['PINS probably missing. INCOMPLETE CSV, NaNs added. Effort condition: ' num2str(effcond) ' block: ' num2str(blk)]);
-                dataraw(:,[3:5 6:8 12:14 15:17])=-dataraw(:,[3:5 6:8 12:14 15:17]);
+                dataraw(:,[3:5 6:8 12:14 15:17]) = -dataraw(:,[3:5 6:8 12:14 15:17]);
                 % get time
                 fs = devicefs; % data collection hz
                 fc = 20; % low pass filter frequency cut off
@@ -203,23 +206,33 @@ for subj = 1:length(subject.list)
             trajdata=trajdata(:,3:end);
             % get time and trim first 60 s
             trajtime = [1:size(trajdata,1)]/trajfs;
-            pp.trajtime{effcond,blk} = trajtime(:);
-            pp.Lasis{effcond,blk} = trajdata(:,1:3);
-            pp.Rasis{effcond,blk} = trajdata(:,4:6);
-            pp.Lpsis{effcond,blk} = trajdata(:,7:9);
-            pp.Rpsis{effcond,blk} = trajdata(:,10:12);
-            pp.Lthigh{effcond,blk} = trajdata(:,13:15);
-            pp.Lknee{effcond,blk} = trajdata(:,16:18);
-            pp.Ltibia{effcond,blk} = trajdata(:,19:21);
-            pp.Lankle{effcond,blk} = trajdata(:,22:24);
-            pp.Lheel{effcond,blk} = trajdata(:,25:27);
-            pp.Ltoe{effcond,blk} = trajdata(:,28:30);
-            pp.Rthigh{effcond,blk} = trajdata(:,31:33);
-            pp.Rknee{effcond,blk} = trajdata(:,34:36);
-            pp.Rtibia{effcond,blk} =trajdata(:,37:39);
-            pp.Rankle{effcond,blk} = trajdata(:,40:42);
-            pp.Rheel{effcond,blk} = trajdata(:,43:45);
-            pp.Rtoe{effcond,blk} = trajdata(:,46:48);
+            if size(trajdata,2) < 26
+                pp.trajtime{effcond,blk} = trajtime(:);
+                pp.Rankle{effcond,blk} = trajdata(:,4:6);
+                pp.Rheel{effcond,blk} = trajdata(:,1:3);
+                pp.Rtoe{effcond,blk} = trajdata(:,7:9);
+                pp.Lankle{effcond,blk} = trajdata(:,13:15);
+                pp.Lheel{effcond,blk} = trajdata(:,16:18);
+                pp.Ltoe{effcond,blk} = trajdata(:,19:21);
+            else
+                pp.trajtime{effcond,blk} = trajtime(:);
+                pp.Lasis{effcond,blk} = trajdata(:,1:3);
+                pp.Rasis{effcond,blk} = trajdata(:,4:6);
+                pp.Lpsis{effcond,blk} = trajdata(:,7:9);
+                pp.Rpsis{effcond,blk} = trajdata(:,10:12);
+                pp.Lthigh{effcond,blk} = trajdata(:,13:15);
+                pp.Lknee{effcond,blk} = trajdata(:,16:18);
+                pp.Ltibia{effcond,blk} = trajdata(:,19:21);
+                pp.Lankle{effcond,blk} = trajdata(:,22:24);
+                pp.Lheel{effcond,blk} = trajdata(:,25:27);
+                pp.Ltoe{effcond,blk} = trajdata(:,28:30);
+                pp.Rthigh{effcond,blk} = trajdata(:,31:33);
+                pp.Rknee{effcond,blk} = trajdata(:,34:36);
+                pp.Rtibia{effcond,blk} =trajdata(:,37:39);
+                pp.Rankle{effcond,blk} = trajdata(:,40:42);
+                pp.Rheel{effcond,blk} = trajdata(:,43:45);
+                pp.Rtoe{effcond,blk} = trajdata(:,46:48);
+            end
             end % isempty
         end %block
     end %effort condition

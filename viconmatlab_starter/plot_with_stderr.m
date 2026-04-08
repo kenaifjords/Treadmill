@@ -19,7 +19,7 @@ lower = y - ysde; %length(lower)
 upper(isnan(upper)) = 0;
 lower(isnan(lower)) = 0;
 
-transparency = 0.2;
+transparency = 0.3;
 edge = color; %[0 0 1]; %color;
 matlinecolor = [color 2*transparency];
 % figure(); hold on;

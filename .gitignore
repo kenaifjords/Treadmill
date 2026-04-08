@@ -14,3 +14,5 @@ viconmatlab_starter/bootstrap_data
 !*.m
 *.7z
 *.zip
+control_force.mat
+control_mark.mat

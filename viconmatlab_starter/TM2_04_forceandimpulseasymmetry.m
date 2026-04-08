@@ -449,5 +449,5 @@ acount = 1; bcount = 1; ccount = 1;
 % figure(1005);
 % plotAsymmetryCurves(blkinclude,'toe off FZ (N)',toeFz);
 
-clearvars -except asym asym_all colors F p ID IK subject
+clearvars -except asym asym_all colors F p ID IK subject fast_all slow_all
 toc

@@ -1,13 +1,14 @@
  function getBarPlot_groupsorted(fitgrpdata,titlein,ylimvec)
  % make sure to set unincluded values to NAN
+ % fitgrpdata is a 
 %% use superbar CORRECTED first exposure asymmetry
 clear colr edgcolr
 global colors subject
 indivoffset = 0.075; indivoffset2 = -0.075;
-ylow = ylimvec(1); yhigh = ylimvec(2);
+
 
 fitgrpmean = mean(fitgrpdata,1, 'omitnan');
-fitgrpste = std(fitgrpdata,[],1,'omitnan')./ sum(~isnan(fitgrpdata));
+fitgrpste = std(fitgrpdata,[],1,'omitnan')./ sqrt(sum(~isnan(fitgrpdata)));
 
 % bars within groups in rows (pair first and second visits)
 % all group hf paired with ls
@@ -19,7 +20,11 @@ barer(:,1) = [fitgrpste(1) fitgrpste(5)];
 barer(:,2) = [fitgrpste(2) fitgrpste(4)];
 barer(:,3) = [fitgrpste(3) NaN];
 
-hold on; ylim([ylow,yhigh]);
+hold on;
+if ~isempty(ylimvec)
+    ylow = ylimvec(1); yhigh = ylimvec(2);
+    ylim([ylow,yhigh]);
+end
 colr = nan(3,2,3);
 colr(1,1,:) = colors.high; colr(1,2,:) = colors.low; %colr(1,3,:) = colors.control;
 colr(2,1,:) = colors.low; colr(2,2,:) = colors.high; %colr(2,3,:) = colors.control;
@@ -52,6 +57,7 @@ for j = 1:size(fitgrpdata,1)
     plot(X(3,1)-indivoffset,fitgrpdata(j,3),'k.')
 end
 %% if we want subject number labels
+if 0
 for j = 1:size(fitgrpdata,1)
     % hf
     if j < sum(~isnan(fitgrpdata(:,1)))
@@ -72,6 +78,7 @@ for j = 1:size(fitgrpdata,1)
     if j < sum(~isnan(fitgrpdata(:,5)))
         text(X(1,2)-indivoffset2,fitgrpdata(j,5),subject.lowsecondlist{j}); % num2str(subject.lsecond(j)))
     end
+end
 end
 beautifyfig
 end
