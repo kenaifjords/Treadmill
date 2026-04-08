@@ -4,9 +4,6 @@ library(sjPlot)
 library(glmmTMB)# work on VMR data based on tutorial from: https://m-clark.github.io/mixed-models-with-R/random_intercepts.html#example-student-gpa
 library(car)
 library(ggplot2)
-library(lme4)
-library(lmerTest)
-#library(moderndive)
 library(jtools)
 library(sjmisc)
 library(car)
@@ -14,28 +11,306 @@ library(DHARMa)
 library(tidyverse)
 library(detectseparation)
 library(hglm)
+library(ggpubr)
+library(rstatix)
+library(dplyr)
+library(tidyr)
 
 # Read CSV into R
-dataparam <- read.csv(file="C:\\Users\\rache\\OneDrive\\Documents\\GitHub\\treadmill\\viconmatlab_starter\\Rmat_param.csv", header=TRUE, sep=",")
-# dataparam <- na.omit(dataparam)
+dataparam <- read.csv(file="C:\\Users\\rache\\OneDrive\\Documents\\GitHub\\treadmill\\viconmatlab_starter\\Rmat_param_new2.csv", header=TRUE, sep=",")
+# most of paper was with _new2, but updated exp fits using fmincon for new3
+dataparam <- na.omit(dataparam)
 dataparam$effortcondition[dataparam$effortcondition == 3] <- 0
-dataparam$numberofvisits = dataparam$twovisit + 1
-dataparam$norm_added_mass <- dataparam$added_mass/dataparam$mass
-dataparam$zplat <- 1/2 * log((1 + dataparam$sla_plateau) / (1 - dataparam$sla_plateau))#(dataparam$sla_plateau + 1)/2
-dataparam$logsslearnrate <- log(dataparam$ss_learnrate)
-dataparam$normsla <- (dataparam$sla_plateau + 1) / 2
-data_rot <- dataparam[dataparam$exposure>0,]# removes the washout blocks
-data_twovisit <- dataparam[dataparam$twovisit==1,] # selects participants that completed 2 visits
-data_tworot <- data_twovisit[data_twovisit$exposure>0,] # removes washout for participants that completed 2 visits
-data_visit2only <- dataparam[dataparam$exposure>2,] # keeps only data from the second visit
-data_expose2 <- dataparam[dataparam$exposure>1,]
-data_expose2to3 <-data_expose2[data_expose2$exposure<4,]
+dataparam$effortcondition <- as.factor(dataparam$effortcondition)
+dataparam$block <- as.factor(dataparam$block)
+dataparam$exposure <- as.factor(dataparam$exposure)
 
-data_expose1 <- dataparam[dataparam$exposure==1,]
-# average added mass
-lowaddedmass <- data_expose1$added_mass[data_expose1$effortcondition == 2]/2.205
+## repeated measures anova for step length in  the phases of the learning block
+phase_anov <-list()
+phase_lm <- list()
+for (ib in 4:6) {
+  # between subjects for groups, within subjects for phases
+  data_rm00 = dataparam[dataparam$block == ib & dataparam$visit == 2,]
+  data_rm0 <- select(data_rm00,subj, effortcondition,sla_initial, sla_early,sla_late,sla_plateau)
+  data_rm <- tidyr::gather(data_rm0,key = "phase", value = "asym", sla_initial, sla_early, sla_late, sla_plateau)
+  
+  # data_rm0 <- select(data_rm00,subj, effortcondition,sta_initial, sta_early,sta_late,sta_plateau)
+  # data_rm <- tidyr::gather(data_rm0,key = "phase", value = "asym", sta_initial, sta_early, sta_late, sta_plateau)
+  # 
+  # data_rm0 <- select(data_rm00,subj, effortcondition,swa_initial, swa_early,swa_late,swa_plateau)
+  # data_rm <- tidyr::gather(data_rm0,key = "phase", value = "asym", swa_initial, swa_early, swa_late, swa_plateau)
+  
+  
+  data_rm %>% convert_as_factor(subj, phase,effortcondition)
+  data_rm$effortcondition <- as.factor(data_rm$effortcondition)
 
-highaddedmass <- data_expose1$added_mass[data_expose1$effortcondition == 1]/2.205
+  data_rm %>%
+    group_by(phase, effortcondition) %>%
+    get_summary_stats(asym, type = "mean_sd")
+
+  # bxp <- ggboxplot(
+  #   data_rm, x = "phase", y = "asym",
+  #   color = "effortcondition", palette = "jco"
+  # )
+  # bxp
+
+  # ANOVA
+  res.aov <- anova_test(
+    data = data_rm, dv = asym, wid = subj,
+    between = effortcondition, within = phase
+  )
+  print(paste("block", ib))
+  print(get_anova_table(res.aov))
+  phase_anov[[ib]] <-res.aov
+  
+}
+
+## Phase, effort condition, savings
+
+dls = dataparam[(dataparam$block == 4 | dataparam$block == 6) & dataparam$visit == 1,]
+dls <- select(dls,subj, block, effortcondition,sla_initial, sla_early,sla_late,sla_plateau)
+dls <- tidyr::gather(dls,key = "phase", value = "asym", sla_initial, sla_early, sla_late, sla_plateau)
+dls$effortcondition <- as.factor(dls$effortcondition)
+  
+  # ANOVA
+res.aov <- anova_test(
+  data = dls,
+  dv = asym,
+  wid = subj,
+  between = effortcondition,
+  within = c(phase, block)
+)
+print(get_anova_table(res.aov))
+
+# stride to plateau in learning
+s2saov <- anova_test(dataparam[dataparam$visit == 1 & dataparam$block == 4,],
+                     dv = stride2plat, wid = subj,
+                     between = c(effortcondition))
+get_anova_table(s2saov)
+
+# compare params between learning and relearning
+varnames <- c("ss_remember","ss_learnrate","ss_initial", "exp_coef","exp_learnrate","exp_const","sla_initial","sla_early", "sla_late","sla_plateau","stride2plat")
+save_ttest <- matrix(list(), nrow = length(varnames), ncol = 3)
+rownames(save_ttest) <- varnames
+colnames(save_ttest) <- c("control","high","low")
+save_rmanova <- list()
+save_lm <- list()
+for (ip in 1:3) { #seq_along(varnames)) {
+  # compare between learning and savings ttest for each group
+  for (igrp in 0:2) {
+    datatt <- dataparam[dataparam$effortcondition == igrp & dataparam$visit == 1 &
+                          (dataparam$block == 4 | dataparam$block == 6),]
+    #formula <- as.formula(paste(varnames[ip], "~ block"))
+    if (igrp == 0) {igrp = 3}
+      # save_ttest[[ip,igrp]] <- t.test(formula, data = datatt, paired = TRUE)
+      temp <-datatt[,c("subj","block",varnames[ip])]
+      wide <- pivot_wider(temp,names_from = block, values_from = all_of(varnames[ip]))
+      bnames <- setdiff(names(wide),"subj")
+      save_ttest[[ip,igrp]] <- t.test(wide[[bnames[1]]], wide[[bnames[2]]], paired = TRUE)
+      print(paste(varnames[ip], "for effort condition (v1)", igrp, "ttest learn v relearn" ))
+      print(save_ttest[[ip,igrp]])
+  }
+}
+
+for (ip in 1:3) { #seq_along(varnames)) {
+  # RM-ANOVA (between groups, within subj)
+  dataov = dataparam[dataparam$visit == 1 & (dataparam$block == 4 | dataparam$bloc == 6),]
+  paramvar <- paste0(varnames[ip])
+  daov <- dplyr::select(dataov, subj, effortcondition,block,all_of(paramvar))
+  save_aov <- anova_test(
+    data = daov, dv = all_of(paramvar), wid = subj,
+    between = c(effortcondition),within = block)
+  save_rmanova[[ip]] <- save_aov
+  # 
+  print(paste(varnames[ip],"rm-anova for learning and relearning"))
+  print(get_anova_table(save_aov))
+  
+  # across both visits
+  # RM-ANOVA (between groups, within subj)
+  d2v = dataparam[dataparam$twovisit == 1 & (dataparam$block == 4 | dataparam$block == 6),]
+  paramvar <- paste0(varnames[ip])
+  dav <- dplyr::select(d2v, subj, exposure, visit, twovisit_group, effortcondition, block, all_of(paramvar))
+  d2vaov <- anova_test(
+    data = dav, dv = all_of(paramvar), wid = subj,
+    between = c(twovisit_group),
+    within = c(exposure))
+  
+  # print(paste(varnames[ip],"rm-anova BOTH VISITS"))
+  # print(get_anova_table(d2vaov))
+}
+
+
+
+
+
+
+## compare steplength in second visit
+#data_v200 = dataparam[dataparam$visit == 2 & (dataparam$block == 4 | dataparam$block == 6),]
+data_v200 = dataparam[dataparam$visit == 2,]
+data_v20 <- dplyr::select(data_v200,subj, effortcondition,block,sla_initial, sla_early,sla_late,sla_plateau)
+data_v2 <- tidyr::gather(data_v20,key = "phase", value = "asym", sla_initial, sla_early, sla_late, sla_plateau)
+data_v2 %>% convert_as_factor(subj, phase,effortcondition,block)
+data_v2$block <-as.factor(data_v2$block)
+  
+# 3 way ANOVA for visit 2
+v2.aov <- anova_test(
+    data = data_v2, dv = asym, wid = subj,
+    between = effortcondition, within = c(phase,block))
+get_anova_table(v2.aov)
+
+
+# 3 way ANOVA for both
+d2v <- dataparam[dataparam$twovisit == 1 & (dataparam$block == 4 | dataparam$block == 6),]
+d2vsla <- dplyr::select(d2v,subj,exposure,visit, twovisit_group, effortcondition,block,sla_initial, sla_early,sla_late,sla_plateau)
+d2vlong <- tidyr::gather(d2vsla,key = "phase", value = "asym", sla_initial, sla_early, sla_late, sla_plateau)
+v2.aov <- anova_test(
+  data = d2vlong, dv = asym, wid = subj,
+  between = twovisit_group, within = c(phase,exposure))
+get_anova_table(v2.aov)
+pdl1 <- ggplot(data=d2vlong, 
+               aes(x = phase, y = (asym), 
+                   color = as.factor(visit))) +
+  geom_point()
+print(pdl1)
+
+
+
+# compare learning parameters in the second visit
+v2save_ttest <- matrix(list(), nrow = length(varnames), ncol = 2)
+rownames(v2_ttest) <- varnames
+v2_ttest <- matrix(list(),nrow = length(varnames), ncol = 6)
+rownames(v2_ttest) <- varnames
+for (ip in seq_along(varnames)) { #seq_along(varnames)
+  # ttest (between groups)
+  for (ib in 4) {
+    dataov = dataparam[dataparam$visit == 2 & dataparam$block == ib,]
+    formula <- as.formula(paste(varnames[ip], "~ effortcondition"))
+    v2_ttest[[ip,ib]] <- t.test(formula, data = dataov)
+    
+    means <- dataov %>%
+      group_by(effortcondition) %>%
+      summarise(mean_var = mean(.data[[varnames[ip]]], na.rm = TRUE))
+    
+    print("")
+    print(paste(varnames[ip], "block", ib, "for effort condition test between groups" ))
+    print(paste("low-high", means[1],"high-low",means[2]))
+    print(v2_ttest[[ip,ib]])
+  }
+}
+
+
+
+## check statespace learning rates in blk 4 visit 2
+datass <- dataparam[dataparam$visit == 2 & dataparam$block == 4,]
+datass %>%
+  group_by(effortcondition,block) %>%
+  summarize(mean_sslr = mean(ss_learnrate, na.rm = TRUE),
+            sd_sslr = sd(ss_learnrate, na.rm = TRUE) / sqrt(n()),
+            mean_explr = mean(exp_learnrate, na.rm = TRUE),
+            sd_explr = sd(exp_learnrate,na.rm = TRUE)/sqrt(n()))
+
+## compare step time in different phases of learning, wahshou, retention
+phase_stime_anov <- list()
+for (ib in 4:6) {
+  # between subjects for groups, within subjects for phases
+  data_rm00 = dataparam[dataparam$block == ib & dataparam$visit == 1,]
+  data_rm0 <- select(data_rm00,subj, effortcondition,sta_initial, sta_early,sta_late,sta_plateau)
+  data_rm <- tidyr::gather(data_rm0,key = "phase", value = "asym", sta_initial, sta_early, sta_late, sta_plateau)
+  data_rm %>% convert_as_factor(subj, phase,effortcondition)
+  data_rm$effortcondition <- as.factor(data_rm$effortcondition)
+  
+  # ANOVA
+  res.aov <- anova_test(
+    data = data_rm, dv = asym, wid = subj,
+    between = effortcondition, within = phase
+  )
+  print(paste("block", ib))
+  print(get_anova_table(res.aov))
+  phase_stime_anov[[ib]] <-res.aov
+  
+  pdl1 <- ggplot(data=data_rm, 
+                 aes(x = phase, y = (asym), 
+                     color = as.factor(effortcondition))) +
+    geom_point()
+  print(pdl1)
+  
+}
+
+## compare step width in different phases of learning, wahshou, retention
+phase_swidth_anov <- list()
+for (ib in 4:6) {
+  # between subjects for groups, within subjects for phases
+  data_rm00 = dataparam[dataparam$block == ib & dataparam$visit == 1,]
+  data_rm0 <- select(data_rm00,subj, effortcondition,swa_initial, swa_early,swa_late,swa_plateau)
+  data_rm <- tidyr::gather(data_rm0,key = "phase", value = "asym", swa_initial, swa_early, swa_late, swa_plateau)
+  data_rm %>% convert_as_factor(subj, phase,effortcondition)
+  data_rm$effortcondition <- as.factor(data_rm$effortcondition)
+  
+  # ANOVA
+  res.aov <- anova_test(
+    data = data_rm, dv = asym, wid = subj,
+    between = effortcondition, within = phase
+  )
+  get_anova_table(res.aov)
+  phase_swidth_anov[[ib]] <-res.aov
+  
+  print(paste("block", ib))
+  print(get_anova_table(res.aov))
+  phase_stime_anov[[ib]] <-res.aov
+  
+  
+  pdl1 <- ggplot(data=data_rm, 
+                 aes(x = phase, y = (asym), 
+                     color = as.factor(effortcondition))) +
+    geom_point()
+  print(pdl1)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## DATA FOR EACH STEP ###
+data <- read.csv(file="C:\\Users\\rache\\OneDrive\\Documents\\GitHub\\treadmill\\viconmatlab_starter\\step_mat.csv", header=TRUE, sep=",")
+bparam <- data[data$block == 2 | data$block == 3,]
+
+bparam$sl <-rowMeans(subset(bparam, select = c(steplength_fast, steplength_slow)),na.rm = TRUE)
+bsl0 <- select(bparam,subj,effortcondition,block,sl)
+
+bsl <- data.frame(subj = factor, effortcondition = factor,sl2 = numeric, sl3 = numeric)
+for (i in 1:max(bsl0$subj)) {
+  bsl$subj[[i]] = i
+  bsl$effortcondition[[i]] = mean(bsl0$effortcondition[bsl0$subj == i,])
+  bsl$sl2[[i]] = mean(bsl0$sl[bsl0$block == 2])
+  bsl$sl3[[i]] = mean(bsl0$sl[bsl0$block == 3])
+}
+  
+bsl <- na.omit(bsl)
+
+bsl <- tidyr::gather(data_rm0,key = "phase", value = "asym", sla_initial, sla_early, sla_late, sla_plateau)
+
+bl.aov <- anova_test(
+  data = bsl, dv = sl, wid = subj,
+  between = effortcondition, within = block
+)
+get_anova_table(bl.aov)
+
+
+
+
+
 
 # plots for learning rate ######################################################
 # all participants, all exposures, sorted by effort condition, this mixes up subjects between the visits

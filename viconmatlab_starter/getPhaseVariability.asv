@@ -1,0 +1,32 @@
+function [phaseVar] = getPhaseVariability(indata)
+% function that we put an asymmetry profile into and out comes the bar plot
+% values
+initialpertstep = 1:5; % 10 steps are included in the computation of intiial perturbation
+earlypertstep = 6:30;
+latepertstep = 31:200;
+endpertstep = 20;
+
+if ~isempty(indata) && length(indata) > max(earlypertstep)
+    lengthprof = length(indata);
+    lastvalid = find(~isnan(indata),1,'last');
+    initial = var(indata(initialpertstep),'omitnan');
+    early = var(indata(earlypertstep),'omitnan');
+    if lastvalid > max(latepertstep)
+        late = var(indata(latepertstep),'omitnan');
+    else
+        late = var(indata(min(latepertstep):end),'omitnan');
+    end
+    if lastvalid > endpertstep
+        ending = var(indata(lastvalid-endpertstep:lastvalid),'omitnan');
+    else
+        ending = NaN;
+    end
+    across = var(indata,'
+else
+    initial = NaN;
+    early = NaN;
+    late = NaN;
+    ending = NaN;
+end
+phaseVar = [initial, early, late, ending, across];
+

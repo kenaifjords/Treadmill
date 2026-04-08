@@ -22,9 +22,11 @@ if 1
 end
 % for R
 if 0
-    TM2_04R_forRmat
-    TM2_04_stepcsv
- end
+    TM2_04R _forRmat
+end
+if 0
+    TM2_04R_stepcsv
+end
 % for propulsion and forces
 if 0
     TM2_04_GRF
@@ -36,7 +38,8 @@ if 0
 end
 
 %%
-TM2_05c_alignstepslowtimeCurves
+if 0
+    TM2_05c_alignstepslowtimeCurves
 % TM2_05_alignlearningCurves; % TM2_05_alignsteptimeCurves; 
 % TM2_05b_alignsteplengthtimeCurves;
 disp('asymmetry plots :)')
@@ -93,4 +96,5 @@ if 0
 % same bare bones code
 % probably should make the align curves concept a function
 TM2_06_percentGaitForcesMoments
+end
 end

@@ -63,11 +63,11 @@ grp = {'hfirst','lfirst','control','hsecond','lsecond'};
 disp('FIRST VISIT (one-way anova: high, low, control)')
 list_blk = [4 5 ]; 
 
-for blk = [4 5 6] %list_blk
+for blk = 6 %[4 5 6] %list_blk
      disp(['BLOCK ' num2str(blk)])
     datin = [firstplat.hfirst{1,blk}' firstplat.lfirst{1,blk}'...
         firstplat.control{1,blk}']; 
-    p0 = anova1(datin,[],'off');
+    p0 = anova1(datin,[],'on');
     for i = 1:3
         disp(['first stride to plateau: ' grp{i} ' '...
             num2str(nanmean(datin(:,i))) ' +/-' ...

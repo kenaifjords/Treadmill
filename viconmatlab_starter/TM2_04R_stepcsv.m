@@ -15,7 +15,7 @@ for subj = 1:subject.n
     end
     % get fast leg (1 for right; 2 for left)
     fastleg = subject.fastleg(subj);
-    for blk = 4:6 % learning, washout, relearning
+    for blk = 1:7 %4:6 % learning, washout, relearning
         clear sl_f sl_s st_f st_s sw_f sw_s
         if fastleg == 1
             sl_f = F(subj).steplengthR{effcond,blk};

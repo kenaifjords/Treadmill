@@ -1,7 +1,7 @@
 % TM2_05_steplength_steptime_unilateral
 global F p subject
 
-normtoslowbaseline = 0;
+normtoslowbaseline = 1;
 normtofastbaseline = 0;
 normtoheight = 0;
 
@@ -149,6 +149,9 @@ plotFastSlowCompareCurves(blkinclude,'steplength (/ baseline slow)',...
     fastlength,slowlength);
 figure(1010); hold on;
 plotFastSlowCompareCurves(4,'steplength',...
+    fastlength,slowlength); % normed to baseline slow step length (division)
+figure(111);
+plotFastSlowCompareCurves(5,'steplength',...
     fastlength,slowlength); % normed to baseline slow step length (division)
 figure(110);
 plotFastSlowCompareCurves(6,'steplength',...

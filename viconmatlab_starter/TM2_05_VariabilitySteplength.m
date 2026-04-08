@@ -410,4 +410,5 @@ for blk = [1 2 3 4 5 6 7]
     disp(['Variability comparerd between control and low: p = ' num2str(v_pa)]);
 end    
         
-
+save('steplengthvar','slv')
+save('steplengthasymvar','

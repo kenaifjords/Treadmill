@@ -1,15 +1,17 @@
 % TM2_05_fiLearning_statespace_exponential
-trimearly = 1; trimi = 5;
+trimearly = 1; trimi = 1; % was 5
 normalizeasymmetry = 0;
+
 for subj = 1:subject.n
+    strtitle = [];
     for effcond = 1:3
         if effcond > size(F(subj).R,1)
-            break
-        end
-        for blk = 1:subject.nblk
+            % do nothing % break
+        else
+        for blk =  1:subject.nblk
             if blk > size(F(subj).R,2)
-                break
-            end
+               % do nothing % break
+            else
             if ismember(blk,[1 2 3 7])
                 ss_fit(subj,effcond,blk,:) = NaN(1,4);
                 exp_fit(subj,effcond,blk,:) = NaN(1,4);
@@ -38,10 +40,23 @@ for subj = 1:subject.n
                     ss_fit_param = [ss_fit_param NaN];
                     % exponential fit
                     ex0 = [-0.4, 0.02, -0.05];
+                    
 %                     figure(subj); hold on;
                     [ex_fit_param, emse] = fitExpLearning0(asymm,ex0);
 %                     title(subject.list{subj})
+%                     strtitle = [strtitle, ' ', num2str(ex_fit_param)];
+%                     xlabel(strtitle);
 %                     legend
+%                     
+%                     if max(ex_fit_param > 1)
+%                         disp(num2str(subj))
+%                         x0 = 10;
+%     y0 = 100;
+%     width = 1200;
+%     height = 375;
+%     set(gcf,'position',[x0,y0,width,height])
+%                     end
+%                     
                     ss_fit(subj,effcond,blk,1:3) = ss_fit_param;
                     exp_fit(subj,effcond,blk,1:3) = ex_fit_param;
                     % add initial value (which is the mean of the first 5
@@ -49,7 +64,9 @@ for subj = 1:subject.n
                     ss_fit(subj,effcond,blk,4) = mean(asymm(1:5),'omitnan');
                     exp_fit(subj,effcond,blk,4) = mean(asymm(1:5),'omitnan');
                 end
-            end  
+            end
+            end
+        end
         end
     end
 end
@@ -64,4 +81,4 @@ for ip = 1:4
     curvefit(ip).ex = sortbyEffortVisitorder_digitout(ep0);
 end
 % save
-save('store_curvefit', 'curvefit')
+% save('store_curvefit_fmincon', 'curvefit')

@@ -187,3 +187,10 @@ disp(['n high right: ' num2str(sum((subject.order(:,1) == 1).*(subject.fastleg =
     '; n control right: ' num2str(sum((subject.order(:,1) == 0).*(subject.fastleg == 1)'))...
     '; n control left: ' num2str(sum((subject.order(:,1) == 0).*(subject.fastleg == 2)'))]);
 toc
+%%
+s = cat(2,[1:length(subject.list)]',[subject.order(:,1)],[subject.age]',...
+    [subject.mass]',[subject.height]',[subject.leglength]');
+colnames = {'subject number' ,'effort condition','age','body mass(kg)',...
+    'height (cm)', 'leg length (cm)'}
+labeled_s = array2table(s,'VariableNames', colnames);
+writetable(labeled_s,'subject_mat.csv')

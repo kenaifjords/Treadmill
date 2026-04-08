@@ -1,9 +1,11 @@
 % TM2_06_forR_learningparam
 clear Rmat
 global F asym
-if 1 
+if 0 
     TM2_05_fitLearning_statespace_exponential
     TM2_05_asymBarPlotsSteplength
+    TM2_05_stridestoplateau
+    
 end
 i = 1;
 colnames = {'subj' 'effortcondition' 'ss_remember' 'ss_learnrate' ... (4)
@@ -12,7 +14,7 @@ colnames = {'subj' 'effortcondition' 'ss_remember' 'ss_learnrate' ... (4)
     'sla_early' 'sla_late' 'sla_plateau' 'sta_initial' 'sta_early'... (20)
     'sta_late' 'sta_plateau' 'swa_initial' 'swa_early' 'swa_late'... (25)
     'swa_plateau' 'visit' 'block' 'twovisit','twovisit_group' ... (30)
-    'firsteff'}; % (31)
+    'firsteff' 'stride2plat'}; % (31)
 for subj = 1:subject.n
     for vis = 1:2
         % are they two visit participants?
@@ -49,7 +51,8 @@ for subj = 1:subject.n
             stabin = abar.sta{effcond,blk}(subj,:);
             swabin = abar.swa{effcond,blk}(subj,:);
             eff1 = subject.order(subj,1);
-            s2plat = 
+            s2plat = fplat(subj,effcond,blk);
+            
             % subj
             Rmat(i,1) = subj;
             % effort condition
@@ -165,7 +168,7 @@ for subj = 1:subject.n
     end
 end
 labeled_Rmat = array2table(Rmat,'VariableNames', colnames);
-writetable(labeled_Rmat,'Rmat_param_new2.csv')
+writetable(labeled_Rmat,'Rmat_param_new3.csv')
 fprintf('param mat made')
             
     

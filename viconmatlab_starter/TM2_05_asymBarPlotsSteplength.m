@@ -43,48 +43,45 @@ end
 [sta] = sortbyEffortVisitorder_02(abar.sta);
 [swa] = sortbyEffortVisitorder_02(abar.swa);
 
-for blk = 1:size(F(subj).R,2)
+for blk = 6 %1:size(F(subj).R,2)
     disp(' ');
     disp(['BLOCK: ' num2str(blk)])
     
     % high
     disp(['high plateau asym: ' num2str(mean(sla.hfirst{1,blk}(:,4))) ' +/-'...
         num2str(std(sla.hfirst{1,blk}(:,4))./size(sla.hfirst{1,blk},1))])
-    [~,p] = ttest(sla.hfirst{1,blk}(:,4));
-    disp(['high; ttest against hypothesis that plateau is symmetrical: '...
-        num2str(p)])
+    [~,p,ci,stat] = ttest(sla.hfirst{1,blk}(:,4));
+    disp(['high; ttest against 0: ' 't(' num2str(stat.df) ') = ' num2str(stat.tstat) ', p = ' num2str(p)])
     disp(' ');
     
     % low
     disp(['low plateau asym: ' num2str(nanmean(sla.lfirst{1,blk}(:,4))) ' +/-'...
         num2str(nanstd(sla.lfirst{1,blk}(:,4))./size(sla.lfirst{1,blk},1))])
-    [~,p] = ttest(sla.lfirst{1,blk}(:,4));
-    disp(['low; ttest against hypothesis that plateau is symmetrical: '...
-        num2str(p)])
+    [~,p,ci,stat] = ttest(sla.lfirst{1,blk}(:,4));
+    disp(['low; ttest against 0: ' 't(' num2str(stat.df) ') = ' num2str(stat.tstat) ', p = ' num2str(p)])
+    
     disp(' ');
     
     % control
     disp(['control plateau asym: ' num2str(nanmean(sla.control{1,blk}(:,4))) ' +/-'...
         num2str(nanstd(sla.control{1,blk}(:,4))./size(sla.control{1,blk},1))])
-    [~,p] = ttest(sla.control{1,blk}(:,4));
-    disp(['control; ttest against hypothesis that plateau is symmetrical: '...
-        num2str(p)])
+    [~,p,ci,stat] = ttest(sla.control{1,blk}(:,4));
+    disp(['control; ttest against 0: ' 't(' num2str(stat.df) ') = ' num2str(stat.tstat) ', p = ' num2str(p)])
+    
     disp(' ');
     
     % high
-    [~,p] = ttest(sla.hfirst{1,blk}(:,4),sla.hfirst{1,3}(:,4));
-    disp(['high; ttest against baseline: '...
-        num2str(p)])
+    [~,p,ci,stat] = ttest(sla.hfirst{1,blk}(:,4),sla.hfirst{1,3}(:,4));
+    disp(['high; ttest against baseline: ' 't(' num2str(stat.df) ') = ' num2str(stat.tstat) ', p = ' num2str(p)])
     
     % low
-    [~,p] = ttest(sla.lfirst{1,blk}(:,4),sla.lfirst{1,3}(:,4));
-    disp(['low; ttest against baseline: '...
-        num2str(p)])
+    [~,p,ci,stat] = ttest(sla.lfirst{1,blk}(:,4),sla.lfirst{1,3}(:,4));
+    disp(['low; ttest against baseline: ' 't(' num2str(stat.df) ') = ' ...
+        num2str(stat.tstat) ', p = ' num2str(p)])
     
     % control
-    [~,p] = ttest(sla.control{1,blk}(:,4),sla.control{1,3}(:,4));
-    disp(['control; ttest against baseline: '...
-        num2str(p)])
+    [~,p,ci,stat] = ttest(sla.control{1,blk}(:,4),sla.control{1,3}(:,4));
+    disp(['control; ttest against baseline: ' 't(' num2str(stat.df) ') = ' num2str(stat.tstat) ', p = ' num2str(p)])
 end
 %% STEPLENGTH pairwise ttests
 disp(' ');

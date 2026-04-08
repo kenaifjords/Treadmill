@@ -3,13 +3,15 @@ function [ex,emse] = fitExpLearning0(error,x0)
 %% contraints
 % x0 for testing [-0.4, 0.02, -0.05]
 % lower / upper bound
-% lowerx0 = [0.9,0.0,-1]; upperx0 = [1,0.1,0];
+lowerx0 = [-1,-0.02,-1]; upperx0 = [1,1,0.5];
 % eval options
 options = optimset('MaxFunEvals',1e10);
 %% use fminsearch / fmincon
-[xf,min] = fminsearch(@(xf) fitLearn_exp(xf,error),x0,options);
-% [xf,min] = fmincon(@(xf)fitLearn_statespace(xf,error,ideal),x0,[],[],[],[],...
-%     lowerx0,upperx0,[],options);
+% [xf,min] = fminsearch(@(xf) fitLearn_exp(xf,error),x0,options);
+% if max(xf) > 1
+    [xf,min] = fmincon(@(xf)fitLearn_exp(xf,error),x0,[],[],[],[],...
+        lowerx0,upperx0,[],options);
+% end
 ex = xf;
 emse = min;
 %% plot

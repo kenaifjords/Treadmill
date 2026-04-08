@@ -50,6 +50,8 @@ for col = 1:size(array,2)
         else
             plot(x_place,prof_place,'Color',array_col{i,col})
         end
+        plot([0 x_place(end)],[i/2, i/2],'k')
     end
+    
 end
 end

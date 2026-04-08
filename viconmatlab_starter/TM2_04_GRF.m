@@ -81,7 +81,7 @@ for subj = 1:subject.n
                     sd = [sdf; sds];
                     sdmax = max(sd,[],2);
                     sdmin = min(sd,[],2);
-                    push = sd; push(push < 0) = 0;
+                    push = sd; push(push < 0) = NaN;
                     impsz = min([size(F(subj).impulsefast{effcond,blk},1),...
                         size(F(subj).impulseslow{effcond,blk},1)]);
                     imp0 = [F(subj).impulsefast{effcond,blk}(1:impsz)';...
@@ -91,6 +91,7 @@ for subj = 1:subject.n
                     sdavg = mean(sd,1,'omitnan');
                     minf = mean(sdmin,'omitnan');
                     peakf = mean(sdmax,'omitnan');
+                    
                     imp = mean(imp0,'all','omitnan');
                     % store
                     if dir == 1
@@ -102,7 +103,7 @@ for subj = 1:subject.n
                         forcestride.yimp{effcond,blk}(subj,1) = imp;
                     else
                         forcestride.z{effcond,blk}(subj,:) = sdavg;
-                        forcestride.zpeak{effcond,blk}(subj,:) = peakf;
+                        forcestride.zpeak{effcond,blk}(subj,1) = peakf;
                     end
                 end
             end
@@ -241,7 +242,7 @@ for blk = [2 3]
     getBarPlot_groupsorted(peakvert,['peak zGRF in baseline: blk '...
         num2str(blk)],[0 2]);
     % ANOVA between high, low, control
-    ppush = anova1(peakvert(:,1:3),grp_list(1,1:3),'off');
+    ppeakvert = anova1(peakvert(:,1:3),grp_list(1,1:3),'off');
     text(0.5,1,['one-way ANOVA: p = ' num2str(ppush)])
     % pairwise hihg low
     [~,pt] = ttest2(peakvert(:,1),peakvert(:,2));

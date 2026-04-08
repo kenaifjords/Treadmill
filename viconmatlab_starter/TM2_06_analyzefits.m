@@ -6,7 +6,7 @@ strd = 1:350;
 grp = {'hfirst','lfirst','control','hsecond','lsecond'};
 
 if exist('curvefit')~= 1
-    a = load('store_curvefit');
+    a = load('store_curvefit_fmincon'); % load('store_curvefit');
     curvefit = a.curvefit;
 end
 
@@ -80,7 +80,7 @@ plot([0 strd(end)],[0 0],'k:')
 ylim([-0.6 0.1])
 hold off;
 %% exponential fit
-for blk = [6];% 4 5 6] %1:subject.nblk
+for blk = [4 5 6] %1:subject.nblk
     for igrp = 1:length(grp)
         coef = eval(['curvefit(1).ex.' grp{igrp} '{1,blk}']);
         gain = eval(['curvefit(2).ex.' grp{igrp} '{1,blk}']);
@@ -153,7 +153,7 @@ plot([0 strd(end)],[0 0],'k:')
 ylim([-0.6 0.1])
 hold off;
 %% find average parameters and generate curves
-for blk = [6] % 4 5 6] %1:subject.nblk
+for blk = [4 5 6] %1:subject.nblk
     disp(['BLOCK: ' num2str(blk)]);
     for igrp = 1:length(grp)
         alpha = eval(['curvefit(1).ss.' grp{igrp} '{1,blk}']);
@@ -310,18 +310,18 @@ end
 
 %% PLOT
 blk = 4; fnum = 31;
-ex_ylim = [-0.75 0; 0 0.22; -0.2 0.1];
+ex_ylim = [-1 0; 0 0.22; -0.35 0.1];
 ss_ylim = [0.95 1; 0 0.035; -0.8 0];
 getBarplot_ModelFit
 
 blk = 6; fnum = 33;
-ex_ylim = [-0.4 0; 0 0.12; -0.15 0.1];
-ss_ylim = [0.95 1; 0 0.04; -0.4 0];
+ex_ylim = [-1 0; 0 1; -0.3 0.1];
+ss_ylim = [0.95 1; 0 0.06; -0.6 0];
 getBarplot_ModelFit
 
 blk = 5; fnum = 8; 
-ex_ylim = [0 1.5; 0 0.3; -0.1 0.15];
-ss_ylim = [0.95 1; 0 0.075; 0 0.75];
+ex_ylim = [0 1.25; 0 0.3; -0.2 0.2];
+ss_ylim = [0.95 1; 0 0.05; 0 1];
 getBarplot_ModelFit
 % shift plot sizes
 
